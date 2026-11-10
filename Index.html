@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dynamics User Accounts</title>
+<style>
+:root{--bg:#fff;--fg:#1f2937;--muted:#f3f4f6;--border:#e5e7eb;--primary:#475569;--primary-fg:#fff;--card:#fff;--nav:#1e293b}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--fg);background:var(--bg);font-size:14px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.skip{position:absolute;inset-inline-start:-999px}.skip:focus{inset-inline-start:8px;top:8px;background:#fff;padding:6px 10px;z-index:9}
+header.top{height:48px;background:var(--nav);color:#fff;display:flex;align-items:center;gap:12px;padding:0 16px}
+header.top b{font-weight:600}header.top .sep{width:1px;height:20px;background:rgba(255,255,255,.3)}
+.layout{display:flex;min-height:calc(100vh - 48px)}
+.list{width:440px;flex-shrink:0;border-inline-end:1px solid var(--border);display:flex;flex-direction:column}
+.bar{display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--border)}
+.bar select{flex:1;font-weight:600}
+input,select{border:1px solid #d1d5db;border-radius:6px;padding:6px 8px;background:#fff;height:34px;width:100%}
+input[readonly]{background:var(--muted)}
+input[aria-invalid=true]{border-color:#b91c1c}
+.btn{border:1px solid #d1d5db;background:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.btn.primary{background:var(--primary);color:var(--primary-fg);border-color:var(--primary)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:hover:not(:disabled){filter:brightness(.95)}
+.search{padding:12px;border-bottom:1px solid var(--border)}
+.count{margin:8px 0 0;font-size:12px}
+.axis{padding:8px 12px 4px;border-bottom:1px solid var(--border);font-size:12px}
+.axis .ticks{position:relative;height:12px;margin-inline-start:52px;font-size:10px;margin-top:4px}
+.axis .ticks span{position:absolute;transform:translateX(-50%)}
+ul.users{list-style:none;margin:0;padding:0;overflow-y:auto;flex:1}
+.urow{display:flex;gap:12px;width:100%;text-align:start;border:0;border-bottom:1px solid var(--border);background:transparent;padding:10px 12px;cursor:pointer}
+.urow:hover{background:#f9fafb}.urow[aria-current=true]{background:var(--muted);box-shadow:inset 3px 0 0 var(--primary)}
+.av{width:40px;height:40px;border-radius:50%;background:var(--muted);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.av.lg{width:48px;height:48px;font-size:14px}
+.ubody{flex:1;min-width:0}.uline{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sub{font-size:12px;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dates{display:flex;justify-content:space-between;font-size:11px;color:#374151;margin-top:2px}
+svg.life{width:100%;height:10px;display:block;margin-top:6px}
+.badge{display:inline-flex;align-items:center;gap:6px;border:1px solid;border-radius:999px;padding:1px 8px;font-size:12px;font-weight:500;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge.Active{background:#dcfce7;color:#166534;border-color:#86efac}.badge.Inactive{background:#f1f5f9;color:#1e293b;border-color:#cbd5e1}
+.rec{flex:1;min-width:0;background:#f8fafc;display:flex;flex-direction:column}
+.cmd{display:flex;gap:4px;align-items:center;padding:6px 12px;background:#fff;border-bottom:1px solid var(--border)}
+.cmd .dirty{margin-inline-start:auto;font-size:12px;font-weight:600}
+.head{display:flex;flex-wrap:wrap;align-items:center;gap:12px 32px;padding:16px 20px;background:#fff;border-bottom:1px solid var(--border)}
+.head h1{font-size:20px;margin:0}.head p{margin:0;font-size:12px}
+.head dl{margin:0 0 0 auto;display:flex;gap:8px 32px;flex-wrap:wrap}.head dt{font-size:12px}.head dd{margin:0;font-weight:600}
+.tabs{display:flex;gap:4px;padding:12px 20px 0}
+.tab{border:0;background:var(--muted);padding:6px 12px;border-radius:6px;cursor:pointer}
+.tab[aria-selected=true]{background:#fff;box-shadow:0 0 0 1px var(--border);font-weight:600}
+.panel{padding:12px 20px 24px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));align-items:start}
+.panel[hidden]{display:none}
+section.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px}
+section.card h3{margin:0 0 8px;font-size:14px}
+.f{display:grid;grid-template-columns:150px minmax(0,1fr);align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid #f1f5f9}
+.f:last-child{border-bottom:0}.req{color:#b91c1c;margin-inline-start:2px}
+.inline{display:flex;gap:4px}
+.err{color:#b91c1c;font-size:12px;font-weight:600;margin:4px 0}
+.sublist{list-style:none;margin:4px 0 12px;padding:0;border:1px solid var(--border);border-radius:4px}
+.sublist li{padding:6px 8px;border-bottom:1px solid var(--border)}.sublist li:last-child{border-bottom:0}
+.subhead{display:flex;justify-content:space-between;align-items:center}.subhead h4{margin:0;font-size:12px}
+dialog{border:1px solid var(--border);border-radius:8px;padding:20px;min-width:340px}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+dialog h2{margin:0 0 12px;font-size:16px}
+dialog label{display:flex;gap:8px;align-items:center;padding:4px 0}
+dialog input[type=checkbox]{width:16px;height:16px}
+.dfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.toast{position:fixed;bottom:16px;inset-inline-end:16px;background:#111827;color:#fff;padding:10px 14px;border-radius:6px;opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}.toast.bad{background:#991b1b}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:900px){.layout{flex-direction:column}.list{width:100%}}
+@media (forced-colors:active){.badge::before{background:CanvasText}}
+.adbox{border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin:6px 0 10px;background:#f8fafc}
+.adbox .nm{font-weight:600}.adbox .em{font-size:12px;color:#374151}
+.isad{display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:999px;padding:1px 8px;font-size:12px;font-weight:600;margin-bottom:6px}
+.ntf{list-style:none;margin:6px 0 0;padding:0;border:1px solid var(--border);border-radius:4px;font-size:12px}
+.ntf li{padding:6px 8px;border-bottom:1px solid var(--border)}.ntf li:last-child{border-bottom:0}
+.hint{font-size:12px;color:#374151;margin:6px 0}
+pre.mail{white-space:pre-wrap;background:#f8fafc;border:1px solid var(--border);border-radius:6px;padding:10px;font:12px/1.5 ui-monospace,Menlo,monospace;max-height:260px;overflow:auto;margin:0}
+.case{border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:13px}
+.case .t{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.case dl{display:grid;grid-template-columns:110px 1fr;gap:2px 8px;margin:8px 0}.case dt{color:#374151}.case dd{margin:0}
+.case p{white-space:pre-wrap;margin:6px 0 0}
+.cst{border-radius:999px;padding:1px 8px;font-size:12px;font-weight:600;border:1px solid}
+.cst.Active{background:#dbeafe;color:#1e3a8a;border-color:#93c5fd}.cst.Resolved{background:#dcfce7;color:#166534;border-color:#86efac}
+.vac{display:inline-block;background:#fef3c7;color:#78350f;border:1px solid #f59e0b;border-radius:999px;padding:1px 8px;font-size:12px;font-weight:600}
+</style>
+</head>
+<body>
+<a class="skip" href="#user-list">Skip to users</a>
+<header class="top"><b>Dynamics 365</b><span class="sep"></span><span>User Accounts</span><nav aria-label="Prototype pages" style="display:flex;gap:14px;margin-inline-start:20px;font-size:13px"><a style="color:#dbeafe" href="<?= url ?>?page=csp" target="_top">CSP</a><a style="color:#dbeafe" href="<?= url ?>?page=account" target="_top">Account</a><a style="color:#dbeafe" href="<?= url ?>?page=opportunity" target="_top">Opportunity</a><a style="color:#dbeafe" href="<?= url ?>?page=admin" target="_top">Admin Center</a></nav><span style="margin-inline-start:auto;background:#fde68a;color:#78350f;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700">TEST DATA</span></header>
+<main class="layout">
+  <section class="list" id="user-list" tabindex="-1" aria-label="Users">
+    <div class="bar">
+      <select id="view" aria-label="View">
+        <option value="all">All Users</option><option value="active">Active Users</option>
+        <option value="inactive">Inactive Users</option><option value="withEnd">Users with an End Date</option>
+      </select>
+      <button class="btn primary" id="newBtn" type="button">+ New</button>
+    </div>
+    <div class="search">
+      <input id="q" type="search" aria-label="Search users" placeholder="Search name, user name, title">
+      <p class="count" id="count"></p>
+    </div>
+    <figure class="axis" style="margin:0">
+      <figcaption id="axcap">Account lifecycle 2018–2028 · start to end date · red line = today</figcaption>
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+    </figure>
+    <ul class="users" id="users" aria-labelledby="axcap"></ul>
+  </section>
+
+  <section class="rec" aria-label="User record">
+    <div class="cmd" role="toolbar" aria-label="Record commands">
+      <button class="btn ghost" id="saveBtn" type="button">Save</button>
+      <button class="btn ghost" id="toggleBtn" type="button"></button>
+      <button class="btn ghost" id="rolesBtn" type="button">Manage Roles</button>
+      <button class="btn ghost" id="casesBtn" type="button">Billing Support cases</button>
+      <span class="dirty" id="dirty" hidden>Unsaved changes</span>
+    </div>
+    <div class="head">
+      <div style="display:flex;gap:12px;align-items:center"><div class="av lg" id="hAv"></div><div><h1 id="hName"></h1><p>User</p></div></div>
+      <dl>
+        <div><dt>Business Unit</dt><dd id="hBu"></dd></div>
+        <div><dt>End Date</dt><dd id="hEnd"></dd></div>
+        <div><dt>Active Status</dt><dd id="hStatus"></dd></div>
+      </dl>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Form tabs" id="tabs"></div>
+    <div id="panels"></div>
+  </section>
+</main>
+
+<dialog id="picker" aria-labelledby="pkTitle">
+  <h2 id="pkTitle"></h2>
+  <fieldset style="border:0;padding:0;margin:0"><legend class="sr" id="pkLegend"></legend><div id="pkOpts"></div></fieldset>
+  <div class="dfoot"><button class="btn" id="pkCancel" type="button">Cancel</button><button class="btn primary" id="pkOk" type="button">OK</button></div>
+</dialog>
+<dialog id="confirmDlg" aria-labelledby="cfTitle">
+  <h2 id="cfTitle">Discard unsaved changes?</h2>
+  <div class="dfoot"><button class="btn" id="cfNo" type="button">Cancel</button><button class="btn primary" id="cfYes" type="button">Discard</button></div>
+</dialog>
+<dialog id="casesDlg" aria-labelledby="csTitle" style="min-width:min(640px,94vw)">
+  <h2 id="csTitle">Billing Support cases</h2>
+  <div id="csList"></div>
+  <div class="dfoot"><button class="btn" id="csClose" type="button">Close</button></div>
+</dialog>
+<dialog id="adDlg" aria-labelledby="adTitle">
+  <h2 id="adTitle">Make Account Director?</h2>
+  <p id="adWho" style="margin:0 0 8px"></p>
+  <p style="margin:0 0 6px;font-weight:600">Notification to the billing contact</p>
+  <pre class="mail" id="adPreview"></pre>
+  <p class="hint">The Admin Center for Test Company Ltd (account level, all contracts) is updated at the same time.</p>
+  <div class="dfoot"><button class="btn" id="adNo" type="button">Cancel</button><button class="btn primary" id="adYes" type="button">Confirm and notify</button></div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+var SAMPLE_USERS = [{"id": "u-011", "domainName": "test.accountdirector@example.com", "firstName": "Test", "lastName": "Account Director", "title": "Account Director", "primaryEmail": "test.accountdirector@example.com", "mainPhone": "+44 0000 000000", "mobilePhone": "+44 0000 100000", "businessUnit": "Test BU - Billing", "manager": "Test Manager 1", "position": "Account Director", "site": "Test Office", "territory": "EMEA", "nickname": "", "homePhone": "", "employeeId": "TEST-0011", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read-Write", "licenseType": "Professional", "incomingEmail": "Server-Side Synchronization", "outgoingEmail": "Server-Side Synchronization", "defaultQueue": "<User's personal queue>", "capacity": 40, "defaultPresence": "Available", "teams": ["Billing Support EMEA"], "securityRoles": ["Basic User", "Customer Service Manager"], "startDate": "2023-01-09", "endDate": null, "activeStatus": "Active", "createdOn": "2023-01-05", "modifiedOn": "2026-09-01"}, {"id": "u-001", "domainName": "test.user.a@example.com", "firstName": "Test", "lastName": "User A", "title": "Global Support Consultant 2", "primaryEmail": "test.user.a@example.com", "mainPhone": "+44 0000 000001", "mobilePhone": "+44 0000 100001", "businessUnit": "Test BU - Billing", "manager": "Test Manager 1", "position": "Billing Consultant", "site": "Test Site", "territory": "EMEA", "nickname": "", "homePhone": "", "employeeId": "TEST-0001", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read-Write", "licenseType": "Professional", "incomingEmail": "Server-Side Synchronization", "outgoingEmail": "Server-Side Synchronization", "defaultQueue": "Billing - EMEA", "capacity": 100, "defaultPresence": "Available", "teams": ["Billing Support EMEA", "Tier 2 Billing"], "securityRoles": ["Basic User", "Customer Service Representative", "Omnichannel Agent"], "startDate": "2022-03-14", "endDate": null, "activeStatus": "Active", "createdOn": "2022-03-10", "modifiedOn": "2026-09-02"}, {"id": "u-002", "domainName": "test.user.b@example.com", "firstName": "Test", "lastName": "User B", "title": "Global Support Consultant 1", "primaryEmail": "test.user.b@example.com", "mainPhone": "+44 0000 000002", "mobilePhone": "+44 0000 100002", "businessUnit": "Test BU - Billing", "manager": "Test Manager 2", "position": "Billing Consultant", "site": "Test Site", "territory": "EMEA", "nickname": "", "homePhone": "", "employeeId": "TEST-0002", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read-Write", "licenseType": "Professional", "incomingEmail": "Server-Side Synchronization", "outgoingEmail": "Server-Side Synchronization", "defaultQueue": "Billing - EMEA", "capacity": 80, "defaultPresence": "Available", "teams": ["Billing Support EMEA"], "securityRoles": ["Basic User", "Customer Service Representative", "Omnichannel Agent"], "startDate": "2025-11-03", "endDate": "2026-11-30", "activeStatus": "Active", "createdOn": "2025-10-28", "modifiedOn": "2026-10-15"}, {"id": "u-003", "domainName": "test.user.c@example.com", "firstName": "Test", "lastName": "User C", "title": "Billing Escalations Specialist", "primaryEmail": "test.user.c@example.com", "mainPhone": "+44 0000 000003", "mobilePhone": "+44 0000 100003", "businessUnit": "Test BU - Billing", "manager": "Test Manager 1", "position": "Escalations Specialist", "site": "Test Site", "territory": "EMEA", "nickname": "", "homePhone": "", "employeeId": "TEST-0003", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read-Write", "licenseType": "Professional", "incomingEmail": "Server-Side Synchronization", "outgoingEmail": "Server-Side Synchronization", "defaultQueue": "Billing - Escalations", "capacity": 60, "defaultPresence": "Busy", "teams": ["Billing Escalations", "Tier 2 Billing"], "securityRoles": ["Basic User", "Customer Service Representative", "Omnichannel Agent"], "startDate": "2020-06-01", "endDate": null, "activeStatus": "Active", "createdOn": "2020-05-27", "modifiedOn": "2026-07-19"}, {"id": "u-004", "domainName": "test.user.d@example.com", "firstName": "Test", "lastName": "User D", "title": "Global Support Consultant 2", "primaryEmail": "test.user.d@example.com", "mainPhone": "+44 0000 000004", "mobilePhone": "+44 0000 100004", "businessUnit": "Test BU - Billing", "manager": "Test Manager 2", "position": "Billing Consultant", "site": "Test Site", "territory": "NAMER", "nickname": "", "homePhone": "", "employeeId": "TEST-0004", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read-Write", "licenseType": "Professional", "incomingEmail": "Server-Side Synchronization", "outgoingEmail": "Server-Side Synchronization", "defaultQueue": "Refunds", "capacity": 100, "defaultPresence": "Away", "teams": ["Billing Support NAMER", "Refunds Review"], "securityRoles": ["Basic User", "Customer Service Representative"], "startDate": "2021-01-11", "endDate": "2026-09-30", "activeStatus": "Inactive", "createdOn": "2021-01-05", "modifiedOn": "2026-10-01"}, {"id": "u-005", "domainName": "test.user.e@example.com", "firstName": "Test", "lastName": "User E", "title": "Support Manager", "primaryEmail": "test.user.e@example.com", "mainPhone": "+44 0000 000005", "mobilePhone": "+44 0000 100005", "businessUnit": "Test BU - Billing", "manager": "Test Manager 1", "position": "Team Lead", "site": "Test Site", "territory": "EMEA", "nickname": "", "homePhone": "", "employeeId": "TEST-0005", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read-Write", "licenseType": "Professional", "incomingEmail": "Server-Side Synchronization", "outgoingEmail": "Server-Side Synchronization", "defaultQueue": "<User's personal queue>", "capacity": 40, "defaultPresence": "Available", "teams": ["Billing Support EMEA", "Billing Escalations"], "securityRoles": ["Basic User", "Customer Service Manager", "Omnichannel Supervisor"], "startDate": "2019-02-18", "endDate": null, "activeStatus": "Active", "createdOn": "2019-02-12", "modifiedOn": "2026-10-20"}, {"id": "u-006", "domainName": "test.user.f@example.com", "firstName": "Test", "lastName": "User F", "title": "Contractor (test)", "primaryEmail": "test.user.f@example.com", "mainPhone": "+44 0000 000006", "mobilePhone": "", "businessUnit": "Test BU - Billing", "manager": "Test Manager 2", "position": "Billing Consultant", "site": "Test Site", "territory": "EMEA", "nickname": "", "homePhone": "", "employeeId": "TEST-0006", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read-Write", "licenseType": "Basic", "incomingEmail": "None", "outgoingEmail": "None", "defaultQueue": "Billing - EMEA", "capacity": 60, "defaultPresence": "Offline", "teams": ["Billing Support EMEA"], "securityRoles": ["Basic User", "Omnichannel Agent"], "startDate": "2026-04-06", "endDate": "2027-04-05", "activeStatus": "Active", "createdOn": "2026-04-01", "modifiedOn": "2026-04-06"}, {"id": "u-007", "domainName": "test.user.g@example.com", "firstName": "Test", "lastName": "User G", "title": "Global Support Consultant 1", "primaryEmail": "test.user.g@example.com", "mainPhone": "+44 0000 000007", "mobilePhone": "+44 0000 100007", "businessUnit": "Test BU - Member Support", "manager": "Test Manager 1", "position": "Member Support Consultant", "site": "Test Site", "territory": "EMEA", "nickname": "", "homePhone": "", "employeeId": "TEST-0007", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read-Write", "licenseType": "Professional", "incomingEmail": "Server-Side Synchronization", "outgoingEmail": "Server-Side Synchronization", "defaultQueue": "Member Support - EMEA", "capacity": 100, "defaultPresence": "Do not disturb", "teams": ["Member Support EMEA"], "securityRoles": ["Basic User", "Customer Service Representative", "Omnichannel Agent"], "startDate": "2024-08-19", "endDate": "2026-12-31", "activeStatus": "Active", "createdOn": "2024-08-14", "modifiedOn": "2026-10-10"}, {"id": "u-008", "domainName": "test.user.h@example.com", "firstName": "Test", "lastName": "User H", "title": "Billing Analyst", "primaryEmail": "test.user.h@example.com", "mainPhone": "+44 0000 000008", "mobilePhone": "", "businessUnit": "Test BU - Billing", "manager": "Test Manager 2", "position": "Analyst", "site": "Test Site", "territory": "EMEA", "nickname": "", "homePhone": "", "employeeId": "TEST-0008", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read", "licenseType": "Team Member", "incomingEmail": "None", "outgoingEmail": "None", "defaultQueue": "<User's personal queue>", "capacity": 0, "defaultPresence": "Offline", "teams": ["Refunds Review"], "securityRoles": ["Basic User"], "startDate": "2018-10-01", "endDate": "2025-12-19", "activeStatus": "Inactive", "createdOn": "2018-09-25", "modifiedOn": "2025-12-19"}, {"id": "u-009", "domainName": "test.user.i@example.com", "firstName": "Test", "lastName": "User I", "title": "Global Support Consultant 2", "primaryEmail": "test.user.i@example.com", "mainPhone": "+44 0000 000009", "mobilePhone": "+44 0000 100009", "businessUnit": "Test BU - Billing", "manager": "Test Manager 1", "position": "Billing Consultant", "site": "Test Site", "territory": "EMEA", "nickname": "", "homePhone": "", "employeeId": "TEST-0009", "street1": "1 Test Street", "city": "Testville", "stateProvince": "Test County", "postalCode": "TE1 1ST", "country": "United Kingdom", "accessMode": "Read-Write", "licenseType": "Professional", "incomingEmail": "Server-Side Synchronization", "outgoingEmail": "Server-Side Synchronization", "defaultQueue": "Billing - EMEA", "capacity": 100, "defaultPresence": "Available", "teams": ["Billing Support EMEA", "Refunds Review"], "securityRoles": ["Basic User", "Customer Service Representative", "Omnichannel Agent", "Knowledge Manager"], "startDate": "2023-05-22", "endDate": null, "activeStatus": "Active", "createdOn": "2023-05-17", "modifiedOn": "2026-08-28"}, {"id": "u-010", "domainName": "test.integration@example.com", "firstName": "Test", "lastName": "Integration (Application User)", "title": "", "primaryEmail": "test.integration@example.com", "mainPhone": "", "mobilePhone": "", "businessUnit": "Test Org", "manager": "", "position": "", "site": "", "territory": "", "nickname": "", "homePhone": "", "employeeId": "", "street1": "", "city": "", "stateProvince": "", "postalCode": "", "country": "", "accessMode": "Non-interactive", "licenseType": "Device", "incomingEmail": "None", "outgoingEmail": "None", "defaultQueue": "<User's personal queue>", "capacity": 0, "defaultPresence": "Offline", "teams": [], "securityRoles": ["System Customizer"], "startDate": "2021-07-01", "endDate": null, "activeStatus": "Active", "createdOn": "2021-07-01", "modifiedOn": "2026-05-11"}];
+var BUSINESS_UNITS = ["Test Org","Test BU - Billing","Test BU - Member Support","Test BU - Trust & Safety"];
+var ALL_TEAMS = ["Billing Support EMEA","Billing Support NAMER","Billing Escalations","Member Support EMEA","Refunds Review","Tier 2 Billing"];
+var ALL_ROLES = ["Basic User","Customer Service Representative","Customer Service Manager","Omnichannel Agent","Omnichannel Supervisor","Knowledge Manager","System Customizer","System Administrator"];
+var ALL_QUEUES = ["<User's personal queue>","Billing - EMEA","Billing - Escalations","Member Support - EMEA","Refunds"];
+var OPTS = {
+  accessMode:["Read-Write","Administrative","Read","Non-interactive"],
+  licenseType:["Professional","Basic","Team Member","Device"],
+  incomingEmail:["Server-Side Synchronization","Email Router","None"],
+  outgoingEmail:["Server-Side Synchronization","Email Router","None"],
+  defaultQueue:ALL_QUEUES, businessUnit:BUSINESS_UNITS,
+  defaultPresence:["Available","Busy","Do not disturb","Away","Offline"],
+  activeStatus:["Active","Inactive"]
+};
+// Form layout: tab -> sections -> [key,label,type,required]
+var FORM = [
+ {id:"summary",label:"Summary",sections:[
+  {title:"Account Information",fields:[["domainName","User Name","text",1],["firstName","First Name","text"],["lastName","Last Name","text",1],["title","Title","text"],["primaryEmail","Primary Email","email",1],["mainPhone","Main Phone","text"],["mobilePhone","Mobile Phone","text"]]},
+  {title:"Account Status & Dates",fields:[["activeStatus","Active Status","select"],["startDate","Start Date","date",1],["endDate","End Date","date"],["createdOn","Created On","ro"],["modifiedOn","Modified On","ro"]]},
+  {title:"Organization Information",fields:[["businessUnit","Business Unit","select"],["manager","Manager","text"],["position","Position","text"],["site","Site","text"],["territory","Territory","text"]]},
+  {title:"Teams & Security Roles",special:"rel"},
+  {title:"Account Director – Test Company Ltd",special:"ad"}]},
+ {id:"details",label:"Details",sections:[
+  {title:"User Information",fields:[["nickname","Nickname","text"],["employeeId","Employee ID","text"],["homePhone","Home Phone","text"]]},
+  {title:"Mailing Address",fields:[["street1","Street 1","text"],["city","City","text"],["stateProvince","State/Province","text"],["postalCode","ZIP/Postal Code","text"],["country","Country/Region","text"]]}]},
+ {id:"admin",label:"Administration",sections:[
+  {title:"Client Access License (CAL) Information",fields:[["accessMode","Access Mode","select"],["licenseType","License Type","select"]]},
+  {title:"Email Settings",fields:[["incomingEmail","Incoming Email","select"],["outgoingEmail","Outgoing Email","select"],["defaultQueue","Default Queue","select"]]}]},
+ {id:"cs",label:"Customer Service",sections:[
+  {title:"Omnichannel",fields:[["capacity","Capacity","number"],["defaultPresence","Default Presence","select"]]}]}
+];
+
+function pad(n){return (n<10?"0":"")+n}
+var now=new Date(), TODAY=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+var AX0=Date.parse("2018-01-01"), AX1=Date.parse("2028-12-31");
+function pct(d){return Math.min(100,Math.max(0,(Date.parse(d)-AX0)/(AX1-AX0)*100))}
+function fmt(d){if(!d)return "—";var p=d.split("-");return p[2]+"/"+p[1]+"/"+p[0]}
+function fullName(u){return [u.firstName,u.lastName].filter(Boolean).join(" ")||"New User"}
+function initials(u){return ((u.firstName[0]||"")+(u.lastName[0]||"")).toUpperCase()||"NU"}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function el(tag,attrs,text){var e=document.createElement(tag);if(attrs)for(var k in attrs){if(k==="class")e.className=attrs[k];else e.setAttribute(k,attrs[k])}if(text!=null)e.textContent=text;return e}
+function badge(s){return el("span",{"class":"badge "+s},s)}
+
+SAMPLE_USERS.forEach(function(u){if(u.endDate)u.activeStatus="Inactive"});
+var users=clone(SAMPLE_USERS), selectedId=users[0].id, draft=clone(users[0]), isNew=false, activeTab="summary";
+var $=function(id){return document.getElementById(id)};
+
+function saved(){return users.filter(function(u){return u.id===selectedId})[0]}
+function isDirty(){return isNew||JSON.stringify(saved())!==JSON.stringify(draft)}
+
+function toast(msg,bad){var t=$("toast");t.textContent=msg;t.className="toast show"+(bad?" bad":"");clearTimeout(toast._t);toast._t=setTimeout(function(){t.className="toast"},2600)}
+
+function confirmDiscard(cb){
+  if(!isDirty()){cb();return}
+  var d=$("confirmDlg");d.showModal();
+  $("cfYes").onclick=function(){d.close();cb()};
+  $("cfNo").onclick=function(){d.close()};
+}
+
+function lifeSvg(u){
+  var ns="http://www.w3.org/2000/svg",s=document.createElementNS(ns,"svg");
+  s.setAttribute("viewBox","0 0 100 10");s.setAttribute("preserveAspectRatio","none");s.setAttribute("class","life");s.setAttribute("aria-hidden","true");
+  function r(x,y,w,h,f,o){var e=document.createElementNS(ns,"rect");e.setAttribute("x",x);e.setAttribute("y",y);e.setAttribute("width",w);e.setAttribute("height",h);e.setAttribute("fill",f);if(o)e.setAttribute("opacity",o);s.appendChild(e)}
+  var x1=pct(u.startDate),x2=u.endDate?pct(u.endDate):100,c=u.activeStatus==="Active"?"#15803d":"#94a3b8";
+  r(0,4,100,2,"#e5e7eb");r(x1,2,Math.max(.6,x2-x1),6,c,u.endDate?1:.75);
+  if(!u.endDate){var p=document.createElementNS(ns,"polygon");p.setAttribute("points","98,1 100,5 98,9");p.setAttribute("fill",c);s.appendChild(p)}
+  r(pct(TODAY)-.15,0,.3,10,"#b91c1c");
+  return s;
+}
+
+function renderList(){
+  var v=$("view").value,q=$("q").value.trim().toLowerCase();
+  var vis=users.filter(function(u){return v==="active"?u.activeStatus==="Active":v==="inactive"?u.activeStatus==="Inactive":v==="withEnd"?!!u.endDate:true})
+    .filter(function(u){return !q||[fullName(u),u.domainName,u.title,u.businessUnit,u.position].some(function(s){return s.toLowerCase().indexOf(q)>-1})})
+    .sort(function(a,b){return fullName(a).localeCompare(fullName(b))});
+  var a=users.filter(function(u){return u.activeStatus==="Active"}).length;
+  $("count").textContent=vis.length+" shown · "+a+" active · "+(users.length-a)+" inactive";
+  var ul=$("users");ul.innerHTML="";
+  if(!vis.length){ul.appendChild(el("li",{style:"padding:24px;text-align:center"},"No users match this view."))}
+  vis.forEach(function(u){
+    var li=el("li"),b=el("button",{"class":"urow",type:"button"});
+    if(u.id===selectedId)b.setAttribute("aria-current","true");
+    b.appendChild(el("div",{"class":"av"},initials(u)));
+    var body=el("div",{"class":"ubody"}),l1=el("div",{"class":"uline"});
+    l1.appendChild(el("span",{"class":"name"},fullName(u)));l1.appendChild(badge(u.activeStatus));
+    body.appendChild(l1);body.appendChild(el("div",{"class":"sub"},u.title||u.domainName));body.appendChild(lifeSvg(u));
+    var ds=el("div",{"class":"dates"});ds.appendChild(el("span",null,"Start "+fmt(u.startDate)));ds.appendChild(el("span",null,"End "+(u.endDate?fmt(u.endDate):"none")));
+    body.appendChild(ds);b.appendChild(body);
+    b.addEventListener("click",function(){confirmDiscard(function(){selectedId=u.id;draft=clone(u);isNew=false;renderAll()})});
+    li.appendChild(b);ul.appendChild(li);
+  });
+}
+
+function renderHeader(){
+  $("hAv").textContent=initials(draft);$("hName").textContent=fullName(draft);
+  $("hBu").textContent=draft.businessUnit||"—";$("hEnd").textContent=fmt(draft.endDate);
+  $("hStatus").innerHTML="";$("hStatus").appendChild(badge(draft.activeStatus));
+  $("toggleBtn").textContent=draft.activeStatus==="Active"?"Disable":"Enable";
+  var d=isDirty();$("dirty").hidden=!d;$("saveBtn").disabled=!d;
+}
+
+function fieldRow(f){
+  var key=f[0],label=f[1],type=f[2],req=f[3],id="fld-"+key,row=el("div",{"class":"f"});
+  var lb=el("label",{"for":id},label);if(req){var s=el("span",{"class":"req","aria-hidden":"true"},"*");lb.appendChild(s)}
+  row.appendChild(lb);
+  var input;
+  if(type==="select"){input=el("select",{id:id});OPTS[key].forEach(function(o){var op=el("option",{value:o},o);if(draft[key]===o)op.selected=true;input.appendChild(op)})}
+  else{input=el("input",{id:id,type:type==="ro"?"text":type});
+    if(type==="ro"){input.readOnly=true;input.value=fmt(draft[key])}else input.value=draft[key]==null?"":draft[key];
+    if(type==="number")input.min="0";}
+  if(req){input.setAttribute("aria-required","true");if(String(draft[key]||"").trim()==="")input.setAttribute("aria-invalid","true")}
+  var evt=type==="select"||type==="date"?"change":"input";
+  if(type!=="ro")input.addEventListener(evt,function(){
+    var v=input.value;if(type==="number")v=Math.max(0,Number(v)||0);if(type==="date"&&v==="")v=key==="endDate"?null:draft[key];
+    draft[key]=v;
+    if(req){if(String(v||"").trim()==="")input.setAttribute("aria-invalid","true");else input.removeAttribute("aria-invalid")}
+    if(key==="endDate"&&v){draft.activeStatus="Inactive";var sel=$("fld-activeStatus");if(sel)sel.value="Inactive";endDateHint()}
+    renderHeader();if(key==="endDate"||key==="startDate")renderDateError();
+  });
+  if(key==="endDate"){var wrap=el("div",{"class":"inline"});wrap.appendChild(input);
+    var clr=el("button",{"class":"btn",type:"button","aria-label":"Clear End Date"},"\u2715");
+    clr.addEventListener("click",function(){draft.endDate=null;input.value="";renderHeader();renderDateError()});
+    wrap.appendChild(clr);row.appendChild(wrap)} else row.appendChild(input);
+  return row;
+}
+function endBeforeStart(){return !!draft.endDate&&draft.endDate<draft.startDate}
+function renderDateError(){var e=$("dateErr");if(!e)return;e.hidden=!endBeforeStart();var i=$("fld-endDate");if(i){if(endBeforeStart())i.setAttribute("aria-invalid","true");else i.removeAttribute("aria-invalid")}}
+
+function relSection(){
+  var sec=el("section",{"class":"card","aria-label":"Teams & Security Roles"});sec.appendChild(el("h3",null,"Teams & Security Roles"));
+  [["Teams","teams",ALL_TEAMS,"Edit teams","Edit Teams"],["Security Roles","securityRoles",ALL_ROLES,"Manage roles","Manage User Roles"]].forEach(function(c){
+    var h=el("div",{"class":"subhead"});h.appendChild(el("h4",null,c[0]));
+    var b=el("button",{"class":"btn",type:"button"},c[3]);b.addEventListener("click",function(){openPicker(c[4],c[2],c[1])});h.appendChild(b);sec.appendChild(h);
+    var ul=el("ul",{"class":"sublist"});if(!draft[c[1]].length)ul.appendChild(el("li",null,"None"));
+    draft[c[1]].forEach(function(x){ul.appendChild(el("li",null,x))});sec.appendChild(ul);
+  });
+  return sec;
+}
+
+function renderForm(){
+  var tabs=$("tabs"),panels=$("panels");tabs.innerHTML="";panels.innerHTML="";
+  FORM.forEach(function(t){
+    var tb=el("button",{"class":"tab",role:"tab",type:"button",id:"tab-"+t.id,"aria-controls":"panel-"+t.id,"aria-selected":String(t.id===activeTab)},t.label);
+    tb.addEventListener("click",function(){activeTab=t.id;renderForm()});tabs.appendChild(tb);
+    var p=el("div",{"class":"panel",role:"tabpanel",id:"panel-"+t.id,"aria-labelledby":"tab-"+t.id});if(t.id!==activeTab)p.hidden=true;
+    t.sections.forEach(function(s){
+      if(s.special==="rel"){p.appendChild(relSection());return}
+      if(s.special==="ad"){p.appendChild(adSection());return}
+      var sec=el("section",{"class":"card","aria-label":s.title});sec.appendChild(el("h3",null,s.title));
+      s.fields.forEach(function(f){sec.appendChild(fieldRow(f));if(f[0]==="endDate"){var e=el("p",{"class":"err",id:"dateErr",role:"alert"},"End Date can't be earlier than Start Date.");sec.appendChild(e)}});
+      p.appendChild(sec);
+    });
+    panels.appendChild(p);
+  });
+  renderDateError();
+}
+
+var pkKey=null;
+function openPicker(title,options,key){
+  pkKey=key;$("pkTitle").textContent=title;$("pkLegend").textContent=title;var box=$("pkOpts");box.innerHTML="";
+  options.forEach(function(o,i){var lb=el("label"),cb=el("input",{type:"checkbox",value:o,id:"pk"+i});cb.checked=draft[key].indexOf(o)>-1;lb.appendChild(cb);lb.appendChild(document.createTextNode(o));box.appendChild(lb)});
+  $("picker").showModal();
+}
+$("pkCancel").addEventListener("click",function(){$("picker").close()});
+$("pkOk").addEventListener("click",function(){
+  draft[pkKey]=[].slice.call($("pkOpts").querySelectorAll("input:checked")).map(function(c){return c.value});
+  $("picker").close();renderForm();renderHeader();
+});
+
+function save(next){
+  next=next||draft;
+  var miss=[];if(!next.domainName.trim())miss.push("User Name");if(!next.lastName.trim())miss.push("Last Name");if(!next.primaryEmail.trim())miss.push("Primary Email");
+  if(miss.length){toast("Required fields missing: "+miss.join(", "),true);return}
+  if(next.endDate&&next.endDate<next.startDate){toast("End Date can't be earlier than Start Date.",true);return}
+  if(next.endDate&&next.activeStatus==="Active"){next.activeStatus="Inactive";toast("Users with an End Date are set to Inactive.")}
+  var rec=clone(next);rec.modifiedOn=TODAY;var before=isNew?null:saved();
+  if(isNew)users.push(rec);else users=users.map(function(u){return u.id===rec.id?rec:u});
+  draft=clone(rec);isNew=false;toast(fullName(rec)+" saved");renderAll();
+  if(before&&typeof adState!=="undefined"&&rec.id===adState.ad.userId){
+    var a=adFromUser(before),b=adFromUser(rec);
+    if(rec.activeStatus!=="Active")vacateAD(rec);
+    else if(adState.ad.active===false)pushAD(rec,"reactivated");
+    else if(a.name!==b.name||a.email!==b.email||a.phone!==b.phone||a.office!==b.office||a.managerEmail!==b.managerEmail)pushAD(rec,"updated");
+  }
+}
+$("saveBtn").addEventListener("click",function(){save()});
+$("toggleBtn").addEventListener("click",function(){if(draft.activeStatus!=="Active"&&draft.endDate){toast("Clear the End Date before enabling this user.",true);return}draft.activeStatus=draft.activeStatus==="Active"?"Inactive":"Active";if(isNew)renderAll();else save(draft)});
+$("rolesBtn").addEventListener("click",function(){openPicker("Manage User Roles",ALL_ROLES,"securityRoles")});
+$("newBtn").addEventListener("click",function(){confirmDiscard(function(){
+  var u={id:"u-"+Date.now(),domainName:"",firstName:"",lastName:"",title:"",primaryEmail:"",mainPhone:"",mobilePhone:"",businessUnit:"Test BU - Billing",manager:"",position:"",site:"",territory:"",nickname:"",homePhone:"",employeeId:"",street1:"",city:"",stateProvince:"",postalCode:"",country:"",accessMode:"Read-Write",licenseType:"Professional",incomingEmail:"Server-Side Synchronization",outgoingEmail:"Server-Side Synchronization",defaultQueue:"<User's personal queue>",capacity:100,defaultPresence:"Available",teams:[],securityRoles:["Basic User"],startDate:TODAY,endDate:null,activeStatus:"Active",createdOn:TODAY,modifiedOn:TODAY};
+  selectedId=u.id;draft=u;isNew=true;activeTab="summary";renderAll();
+})});
+$("view").addEventListener("change",renderList);$("q").addEventListener("input",renderList);
+
+(function(){var t=$("ticks");for(var y=2018;y<=2028;y+=2){var s=el("span",null,String(y).slice(2));s.style.left=pct(y+"-01-01")+"%";t.appendChild(s)}})();
+function renderAll(){renderList();renderHeader();renderForm()}
+
+// ===== Account Director sync (Dynamics -> Admin Center) =====
+var URL_BASE="<?= url ?>";
+var HAS_GAS=(typeof google!=="undefined"&&google.script&&google.script.run);
+// Manager directory (fake). The Account Director's manager receives Admin Center messages when the Account Director is inactive.
+var MANAGERS={"Test Manager 1":{email:"test.manager1@example.com",title:"Sales Manager (test)"},"Test Manager 2":{email:"test.manager2@example.com",title:"Sales Manager (test)"}};
+function mgrOf(u){var n=(u&&u.manager)||"",m=MANAGERS[n]||{};return {managerName:n,managerEmail:m.email||"",managerTitle:m.title||""}}
+function adActive(ad){return !!(ad&&!ad.vacant&&ad.name&&!ad.endDate&&ad.active!==false)}
+function routeOf(ad){if(adActive(ad))return {diverted:false,name:ad.name,email:ad.email,role:"Account Director",reason:""};
+  var why=(ad&&ad.name?ad.name:"The Account Director")+" is inactive"+(ad&&ad.endDate?" (end date "+ad.endDate+")":"");
+  if(ad&&ad.managerEmail)return {diverted:true,name:ad.managerName||"Manager",email:ad.managerEmail,role:"Manager of the Account Director",reason:why};
+  return {diverted:true,name:"Billing Support",email:"billing-support@example.com",role:"Billing Support",reason:why+"; no manager on record"}}
+var LOCAL_STATE={contractId:"TEST-CONTRACT-0001",billingContact:{name:"Test Contact",email:"test.contact@example.com"},ad:{userId:"u-011",name:"Test Account Director",initials:"TA",title:"Account Director",email:"test.accountdirector@example.com",phone:"+44 0000 000000",office:"Test Office, UK (GMT)",lang:"English",updatedAt:"",vacant:false,active:true,endDate:"",managerName:"Test Manager 1",managerEmail:"test.manager1@example.com",managerTitle:"Sales Manager (test)"},messages:[],notifications:[],tickets:[],company:"Test Company Ltd",billingSupport:{name:"Billing Support",email:"billing-support@example.com",phone:"+44 0000 000999"}};
+var adState=clone(LOCAL_STATE);
+function api(fn,args,ok,fail){
+  if(HAS_GAS){var r=google.script.run.withSuccessHandler(ok).withFailureHandler(function(e){(fail||function(){toast("Couldn't reach the Admin Center: "+(e&&e.message?e.message:e),true)})(e)});r[fn].apply(r,args||[]);return}
+  // local fallback (file opened outside Apps Script)
+  if(fn==="getState"){LOCAL_STATE.route=routeOf(LOCAL_STATE.ad);ok(clone(LOCAL_STATE));return}
+  if(fn==="setAccountDirector"){var ad=args[0],reason=args[1],now=new Date().toISOString();var prev=LOCAL_STATE.ad;ad.updatedAt=now;ad.active=true;ad.endDate="";ad.vacant=false;LOCAL_STATE.ad=ad;LOCAL_STATE.route=routeOf(ad);
+    LOCAL_STATE.notifications.unshift({id:"NTF-"+(1001+LOCAL_STATE.notifications.length),to:LOCAL_STATE.billingContact,subject:"[TEST] "+(reason==="assigned"?"Your new LinkedIn Account Director":reason==="reactivated"?"Your Account Director is available again":"Your Account Director details changed")+" - Test Company Ltd",body:mailBody(ad,reason,prev),reason:reason,sentAt:now,delivered:"logged (test)"});
+    if(reason==="assigned"||reason==="reactivated")LOCAL_STATE.tickets.forEach(function(c){if(c.status==="Active"){c.status="Resolved";c.resolvedAt=now;c.resolution=(reason==="assigned"?"New Account Director assigned: ":"Account Director active again (End Date removed): ")+ad.name+" ("+ad.email+")."}});
+    ok(clone(LOCAL_STATE))}
+  if(fn==="vacateAccountDirector"){var u=args[0],prev=LOCAL_STATE.ad,now2=new Date().toISOString();if(prev.vacant||prev.active===false){ok(clone(LOCAL_STATE));return}
+    prev.active=false;prev.endDate=u.endDate||"set";prev.updatedAt=now2;if(u.managerEmail){prev.managerName=u.managerName;prev.managerEmail=u.managerEmail;prev.managerTitle=u.managerTitle}
+    var r=routeOf(prev);LOCAL_STATE.route=r;
+    LOCAL_STATE.notifications.unshift({id:"NTF-"+(1001+LOCAL_STATE.notifications.length),to:LOCAL_STATE.billingContact,subject:"[TEST] Your LinkedIn Account Director has changed - Test Company Ltd",body:vacateBody(prev,u.endDate,r),reason:"vacated",sentAt:now2,delivered:"logged (test)"});
+    LOCAL_STATE.tickets.unshift({id:"CAS-TEST-"+("000"+(LOCAL_STATE.tickets.length+1)).slice(-4),type:"AD_UPDATE",contractId:"TEST-CONTRACT-0001",company:"Test Company Ltd",title:"Assign new Account Director - Test Company Ltd",queue:"Billing Support",priority:"Normal",origin:"Automation (Dynamics user end date)",status:"Active",createdAt:now2,
+      description:"Account Director "+prev.name+" ("+prev.email+") has an end date"+(u.endDate?" of "+u.endDate:"")+" and was set to Inactive in Dynamics.\nCustomer messages from the Admin Center are being diverted to "+r.name+" ("+r.email+").\nPlease assign a new Account Director on the Test Company Ltd account team (account level, all contracts)."});
+    ok(clone(LOCAL_STATE))}
+}
+function vacateBody(prev,end,r){return "Hi "+adState.billingContact.name+",\n\n"+prev.name+" is no longer available as the Account Director for your LinkedIn account "+(adState.company||"Test Company Ltd")+(end?" (end date "+end+")":"")+".\n\nUntil a new Account Director is assigned, messages you send from the Admin Center go to "+r.name+" ("+r.role+", "+r.email+").\n\n(TEST NOTIFICATION - fake data)"}
+function dt(x){return new Date(x).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
+function openCases(){return (adState.tickets||[]).filter(function(c){return c.status==="Active"})}
+function updCasesBtn(){var n=openCases().length;$("casesBtn").textContent="Billing Support cases"+(n?" ("+n+" open)":"")}
+function vacateAD(u){var m=mgrOf(u);api("vacateAccountDirector",[{userId:u.id,name:fullName(u),endDate:u.endDate||"",managerName:m.managerName,managerEmail:m.managerEmail,managerTitle:m.managerTitle}],function(st){var had=(adState.tickets||[]).length;adState=st;renderForm();updCasesBtn();
+  var c=st.tickets[0],r=st.route||routeOf(st.ad);toast("Account Director set to Inactive · Admin Center messages now go to "+r.name+" ("+r.email+")"+(c&&st.tickets.length>had?" · case "+c.id+" created":""))})}
+function endDateHint(){toast("End Date set: status changed to Inactive. Save to apply.")}
+$("casesBtn").addEventListener("click",function(){var box=$("csList");box.innerHTML="";var list=adState.tickets||[];
+  if(!list.length)box.appendChild(el("p",null,"No cases yet. A case is created for Billing Support when the Account Director gets an End Date."));
+  list.forEach(function(c){var a=el("article",{"class":"case"});var t=el("div",{"class":"t"});t.appendChild(el("span",null,c.id+" · "+c.title));t.appendChild(el("span",{"class":"cst "+c.status},c.status));a.appendChild(t);
+    var d=el("dl");[["Queue",c.queue],["Priority",c.priority],["Customer",c.company+" (account level)"],["Origin",c.origin],["Created",dt(c.createdAt)]].concat(c.resolvedAt?[["Resolved",dt(c.resolvedAt)]]:[]).forEach(function(r){d.appendChild(el("dt",null,r[0]));d.appendChild(el("dd",null,r[1]))});a.appendChild(d);
+    a.appendChild(el("p",null,c.description));if(c.resolution)a.appendChild(el("p",{style:"font-weight:600"},"Resolution: "+c.resolution));box.appendChild(a)});
+  $("casesDlg").showModal()});
+$("csClose").addEventListener("click",function(){$("casesDlg").close()});
+function adFromUser(u){var m=mgrOf(u);return {userId:u.id,name:fullName(u),initials:initials(u),title:u.title||"Account Director",email:u.primaryEmail,phone:u.mainPhone||u.mobilePhone||"",office:[u.site,u.country].filter(Boolean).join(", "),lang:"English",managerName:m.managerName,managerEmail:m.managerEmail,managerTitle:m.managerTitle}}
+function mailBody(ad,reason,prev){return "Hi "+adState.billingContact.name+",\n\nYour LinkedIn account "+(adState.company||"Test Company Ltd")+" "+(reason==="assigned"?"has a new Account Director":reason==="reactivated"?"Account Director is available again":"Account Director details were updated")+".\n\nAccount Director: "+ad.name+"\nEmail: "+ad.email+"\nPhone: "+ad.phone+"\nOffice: "+ad.office+"\n\n"+(reason==="assigned"&&prev&&!prev.vacant&&prev.name&&prev.name!==ad.name?"This replaces "+prev.name+".\n\n":"")+"You can see and contact your Account Director in the Admin Center.\n\n(TEST NOTIFICATION - fake data)"}
+function pushAD(u,reason){var ad=adFromUser(u);
+  api("setAccountDirector",[ad,reason],function(st){adState=st;renderForm();updCasesBtn();
+    toast((reason==="reactivated"?"Account Director active again · Admin Center messages go to "+ad.name+" · ":"Admin Center updated · ")+"notification sent to "+st.billingContact.name+" ("+st.billingContact.email+")")})}
+function adSection(){
+  var sec=el("section",{"class":"card","aria-label":"Account Director for Test Company Ltd"});sec.appendChild(el("h3",null,"Account Director – "+(adState.company||"Test Company Ltd")));
+  var isAd=!isNew&&draft.id===adState.ad.userId;
+  if(isAd){sec.appendChild(el("span",{"class":"isad"},"This user is the Account Director"));
+    sec.appendChild(el("p",{"class":"hint"},"Active (no End Date): saving changes to name, email, phone, site or manager updates the Admin Center. Setting an End Date makes them Inactive: Admin Center messages are diverted to their manager, the billing contact is told and a Billing Support case is opened."))}
+  var box=el("div",{"class":"adbox"});box.appendChild(el("div",{"class":"em"},"Current Account Director"));
+  if(adState.ad.vacant){box.appendChild(el("span",{"class":"vac"},"Being assigned"));var pv=adState.ad.previous||{};box.appendChild(el("div",{"class":"em",style:"margin-top:4px"},"Previous: "+(pv.name||"-")+(pv.endDate?" (end date "+fmt(pv.endDate)+")":"")));
+    var oc=openCases()[0];if(oc)box.appendChild(el("div",{"class":"em"},"Open case: "+oc.id+" · Billing Support"))}
+  else{box.appendChild(el("div",{"class":"nm"},adState.ad.name));box.appendChild(el("div",{"class":"em"},adState.ad.email+(adState.ad.phone?" · "+adState.ad.phone:"")));
+    var on=adActive(adState.ad),rt=adState.route||routeOf(adState.ad);
+    box.appendChild(el("span",{"class":on?"isad":"vac",style:"margin-top:6px"},on?"Active":"Inactive"+(adState.ad.endDate&&adState.ad.endDate!=="set"?" · end date "+fmt(adState.ad.endDate):"")));
+    box.appendChild(el("div",{"class":"em",style:"margin-top:4px"},"Manager: "+(adState.ad.managerName||"-")+(adState.ad.managerEmail?" ("+adState.ad.managerEmail+")":"")));
+    box.appendChild(el("div",{"class":"em",style:"margin-top:4px;font-weight:600"},"Admin Center messages go to: "+rt.name+" · "+rt.email+(rt.diverted?" (diverted)":"")));
+    var oc2=openCases()[0];if(!on&&oc2)box.appendChild(el("div",{"class":"em"},"Open case: "+oc2.id+" · Billing Support"))}
+  if(adState.ad.updatedAt)box.appendChild(el("div",{"class":"em"},"Updated "+new Date(adState.ad.updatedAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})));
+  sec.appendChild(box);
+  sec.appendChild(el("div",{"class":"em",style:"font-size:12px"},"Billing contact: "+adState.billingContact.name+" ("+adState.billingContact.email+")"));
+  var lk=el("div",{"class":"em",style:"font-size:12px;margin-top:4px;display:flex;gap:12px"});[["Open account team","?page=account"],["Open in CSP","?page=csp"],["Open opportunity","?page=opportunity"]].forEach(function(x){var A=el("a",{href:URL_BASE+x[1],target:"_top"},x[0]);lk.appendChild(A)});sec.appendChild(lk);
+  if(!isAd){var b=el("button",{"class":"btn",type:"button",style:"margin-top:8px"},"Make Account Director");
+    var why=isNew||isDirty()?"Save this user first.":draft.activeStatus!=="Active"||draft.endDate?"Only active users without an End Date can be Account Director.":"";
+    if(why){b.disabled=true;sec.appendChild(b);sec.appendChild(el("p",{"class":"hint"},why))}else{b.addEventListener("click",openAdDlg);sec.appendChild(b)}}
+  if(adState.notifications.length){sec.appendChild(el("h4",{style:"margin:12px 0 0;font-size:12px"},"Notifications sent to billing contact"));
+    var ul=el("ul",{"class":"ntf"});adState.notifications.slice(0,3).forEach(function(n){ul.appendChild(el("li",null,n.id+" · "+n.subject.replace("[TEST] ","")+" · "+new Date(n.sentAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})))});sec.appendChild(ul)}
+  return sec;
+}
+function openAdDlg(){var ad=adFromUser(draft);$("adWho").textContent=fullName(draft)+" ("+draft.primaryEmail+") becomes the Account Director for "+(adState.company||"Test Company Ltd")+" (all contracts)"+(adState.ad.vacant?"":", replacing "+adState.ad.name)+"."+(openCases().length?" Open Billing Support case "+openCases()[0].id+" will be resolved.":"");
+  $("adPreview").textContent="To: "+adState.billingContact.name+" <"+adState.billingContact.email+">\nSubject: [TEST] Your new LinkedIn Account Director - "+(adState.company||"Test Company Ltd")+"\n\n"+mailBody(ad,"assigned",adState.ad);$("adDlg").showModal()}
+$("adNo").addEventListener("click",function(){$("adDlg").close()});
+$("adYes").addEventListener("click",function(){$("adDlg").close();pushAD(draft,"assigned")});
+renderAll();
+updCasesBtn();
+api("getState",[],function(st){adState=st;renderForm();updCasesBtn()},function(){});
+</script>
+</body>
+</html>

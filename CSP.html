@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Support - Contract TEST-CONTRACT-0001</title>
+<style>
+:root{--bg:#f4f4f4;--card:#fff;--fg:#1d1d1d;--sub:#555;--border:#dcdcdc;--blue:#0a66c2;--nav:#004182;--teal:#1f8a99}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,system-ui,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);font-size:15px}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+a{color:var(--blue)}
+.skip{position:absolute;inset-inline-start:-999px}.skip:focus{inset-inline-start:8px;top:8px;background:#fff;padding:6px 10px;z-index:30}
+header.top{background:var(--nav);height:64px;display:flex;align-items:center;gap:14px;padding:0 24px;color:#fff}
+.logo{background:#fff;color:var(--nav);font-weight:800;border-radius:3px;width:30px;height:30px;display:grid;place-items:center;font-size:18px}
+.brand{letter-spacing:.15em;font-size:18px;font-weight:500}
+.hbtn{border:1px solid #ffffffaa;background:#0a66c2;color:#fff;border-radius:6px;padding:6px 12px;font-weight:600;cursor:pointer}
+.navlinks{display:flex;gap:14px;font-size:13px;margin-inline-start:auto}.navlinks a{color:#dbeafe}
+.testbadge{background:#fde68a;color:#78350f;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700}
+.layout{display:flex;min-height:calc(100vh - 64px)}
+nav.side{width:300px;flex-shrink:0;background:#fff;border-inline-end:1px solid var(--border);padding:28px 0}
+.cust{display:flex;gap:12px;align-items:center;padding:0 28px 22px}
+.cust .ic{width:52px;height:52px;background:#8c8c8c;border-radius:4px;display:grid;place-items:center;color:#fff;font-weight:700}
+.cust b{display:block}.cust span{color:var(--sub);font-size:14px}
+nav.side button{display:block;width:100%;text-align:start;border:0;background:none;padding:11px 28px;font-size:16px;color:#333;cursor:pointer}
+nav.side button:hover{background:#f3f3f3}
+nav.side button[aria-current=page]{font-weight:600;box-shadow:inset 3px 0 0 var(--blue)}
+main{flex:1;min-width:0;padding:22px 40px 40px}
+.crumb{display:flex;gap:10px;align-items:center;font-size:16px;margin-bottom:12px}.crumb b{font-weight:600}
+.card{background:var(--card);border:1px solid var(--border);border-radius:2px}
+.chead{padding:20px 32px;display:flex;gap:16px;align-items:flex-start}
+.folder{width:52px;height:52px;border-radius:3px;background:var(--teal);display:grid;place-items:center;flex-shrink:0}
+.chead h1{font-size:21px;margin:0;font-weight:600;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tag{background:#b45309;color:#fff;font-size:15px;padding:1px 10px;border-radius:2px;font-weight:600}
+.chead .sub{color:var(--sub)}
+.facts{display:grid;grid-template-columns:132px 1fr;gap:12px 0;padding:0 32px 26px}
+.facts dt{color:var(--sub)}.facts dd{margin:0}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#16a34a;margin-inline-end:6px}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--border);padding:0 20px;margin-top:30px;background:#fff;border:1px solid var(--border);border-bottom:0}
+.tab{border:0;background:none;padding:16px 14px 14px;font-size:17px;color:#555;cursor:pointer;border-bottom:3px solid transparent}
+.tab[aria-selected=true]{color:var(--blue);border-bottom-color:var(--blue)}
+.panel{background:#fff;border:1px solid var(--border);padding:26px 32px 40px}
+.panel[hidden]{display:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px 40px}
+.blk h2{font-size:19px;margin:0 0 6px;font-weight:600;display:flex;align-items:center;gap:12px}
+.blk p{margin:2px 0;line-height:1.5}
+.link{border:0;background:none;color:var(--blue);font-weight:600;cursor:pointer;padding:0;font-size:14px}
+.link:hover{text-decoration:underline}
+.flash{animation:flash 2.5s ease-out}@keyframes flash{0%{background:#fde68a}100%{background:transparent}}
+table{width:100%;border-collapse:collapse}th,td{text-align:start;padding:10px 8px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top}th{color:var(--sub);font-weight:600}
+.kv{display:grid;grid-template-columns:200px 1fr;gap:10px 16px}.kv dt{color:var(--sub)}.kv dd{margin:0}
+footer{display:flex;gap:16px;align-items:center;border-top:1px solid var(--border);margin-top:60px;padding-top:24px;font-size:14px}
+dialog{border:0;border-radius:8px;padding:0;width:min(520px,94vw);box-shadow:0 8px 32px #0000004d;background:#fff;color:#1d1d1d;color-scheme:light}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border)}.dh h2{margin:0;font-size:18px}
+.db{padding:16px 20px;display:grid;gap:12px}.df{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--border)}
+label.f{display:grid;gap:4px;font-weight:600;font-size:14px}
+.f input{border:1px solid #8c8c8c;border-radius:4px;padding:8px;font-weight:400;background:#fff !important;color:#1d1d1d !important;-webkit-text-fill-color:#1d1d1d}
+.btn{border:1px solid #666;background:#fff;border-radius:999px;padding:6px 16px;font-weight:600;cursor:pointer}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.err{color:#b91c1c;font-size:13px;font-weight:600;margin:0}
+.toast{position:fixed;bottom:18px;inset-inline-end:18px;background:#1d2226;color:#fff;padding:10px 14px;border-radius:6px;opacity:0;transition:opacity .2s;z-index:40;max-width:420px}
+.toast.show{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:900px){.layout{flex-direction:column}nav.side{width:100%}.grid2{grid-template-columns:1fr}main{padding:16px}.navlinks{display:none}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <span class="logo" aria-hidden="true">in</span><span class="brand">CUSTOMER SUPPORT</span>
+  <button class="hbtn" type="button" data-na="Migration Help">Migration Help</button>
+  <nav class="navlinks" aria-label="Prototype pages"><a href="<?= url ?>?page=account" target="_top">Account</a><a href="<?= url ?>?page=opportunity" target="_top">Opportunity</a><a href="<?= url ?>" target="_top">Account Director (Dynamics users)</a><a href="<?= url ?>?page=admin" target="_top">Admin Center</a></nav>
+  <span class="testbadge">TEST DATA</span>
+</header>
+<div class="layout">
+  <nav class="side" aria-label="Customer">
+    <div class="cust"><div class="ic" aria-hidden="true">TC</div><div><b>Test Company Ltd</b><span>Customer</span></div></div>
+    <button type="button" data-na="Customer info">Customer info</button>
+    <button type="button" aria-current="page">Contracts &amp; orders</button>
+    <button type="button" data-na="Marketing accounts">Marketing accounts</button>
+    <button type="button" data-na="Credit cards">Credit cards</button>
+    <button type="button" data-na="Billing accounts">Billing accounts</button>
+    <button type="button" data-na="Provisioning accounts">Provisioning accounts</button>
+    <button type="button" data-na="TeamLink groups">TeamLink groups</button>
+    <button type="button" id="actBtn">Activity log</button>
+  </nav>
+  <main id="content" tabindex="-1">
+    <div class="crumb"><span>Contracts</span><span aria-hidden="true">›</span><b>Contract TEST-CONTRACT-0001</b></div>
+    <section class="card" aria-labelledby="cTitle">
+      <div class="chead">
+        <div class="folder" aria-hidden="true"><svg width="26" height="22" viewBox="0 0 26 22"><path d="M2 3h8l2 3h12v14H2z" fill="none" stroke="#fff" stroke-width="2"/></svg></div>
+        <div><h1 id="cTitle">Contract TEST-CONTRACT-0001 <span class="tag">Test Billing</span></h1><div class="sub">Contract</div></div>
+      </div>
+      <dl class="facts">
+        <dt>Dates</dt><dd>Mar 1, 2026 to Feb 29, 2028</dd>
+        <dt>Status</dt><dd><span class="dot" aria-hidden="true"></span>Active</dd>
+        <dt>Customer</dt><dd>Test Company Ltd</dd>
+        <dt>Fulfillment(s)</dt><dd><a href="#" data-na="Fulfillment">TEST-FUL-0001</a></dd>
+      </dl>
+    </section>
+
+    <div class="tabs" role="tablist" aria-label="Contract details" id="tabs">
+      <button class="tab" role="tab" type="button" id="t-sum" aria-controls="p-sum" aria-selected="false">Summary</button>
+      <button class="tab" role="tab" type="button" id="t-con" aria-controls="p-con" aria-selected="true">Contacts</button>
+      <button class="tab" role="tab" type="button" id="t-bil" aria-controls="p-bil" aria-selected="false">Billing</button>
+      <button class="tab" role="tab" type="button" id="t-adm" aria-controls="p-adm" aria-selected="false">Admin Center</button>
+      <button class="tab" role="tab" type="button" id="t-ord" aria-controls="p-ord" aria-selected="false">Orders</button>
+    </div>
+
+    <div class="panel" role="tabpanel" id="p-con" aria-labelledby="t-con">
+      <div class="grid2">
+        <div class="blk"><h2>Primary contact</h2><p>Test Contact</p><p>test.contact@example.com</p><p>+44 0000 000001</p></div>
+        <div class="blk" id="bcBlk"><h2>Billing contact <button class="link" type="button" id="bcEdit">Edit</button></h2>
+          <p id="bcName">Test Contact</p><p id="bcEmail">test.contact@example.com</p><p id="bcPhone">+44 0000 000001</p></div>
+        <div class="blk"><h2>Ship to address</h2><p>Test Company Ltd</p><p>1 Test Street</p><p>Testville, Test County TE1 1ST</p><p>United Kingdom</p></div>
+        <div class="blk"><h2>Bill to address</h2><p>Test Company Ltd</p><p>1 Test Street</p><p>Testville, Test County TE1 1ST</p><p>United Kingdom</p></div>
+      </div>
+    </div>
+
+    <div class="panel" role="tabpanel" id="p-sum" aria-labelledby="t-sum" hidden>
+      <dl class="kv">
+        <dt>Contract</dt><dd>TEST-CONTRACT-0001 · Renewal · 2 products</dd>
+        <dt>Value</dt><dd>£10,000.00 · Billed quarterly</dd>
+        <dt>Opportunity</dt><dd><a href="<?= url ?>?page=opportunity" target="_top">Test Company Ltd-Renewal--RTCD 02/15/2028</a></dd>
+        <dt>Account Executive</dt><dd>Test Account Executive</dd>
+        <dt>Account Director</dt><dd><span id="sAd"></span> · <a href="<?= url ?>?page=account" target="_top">account team</a></dd>
+        <dt>Billing contact</dt><dd id="sBc"></dd>
+        <dt>Open cases</dt><dd id="sCases">—</dd>
+      </dl>
+    </div>
+    <div class="panel" role="tabpanel" id="p-bil" aria-labelledby="t-bil" hidden>
+      <dl class="kv"><dt>Billing frequency</dt><dd>Quarterly</dd><dt>Payment method</dt><dd>Test card - 0000</dd><dt>Invoice currency</dt><dd>GBP</dd><dt>Invoice recipients</dt><dd id="bInv"></dd><dt>Billing system</dt><dd>Test Billing System</dd></dl>
+    </div>
+    <div class="panel" role="tabpanel" id="p-adm" aria-labelledby="t-adm" hidden>
+      <p style="margin-top:0">The customer's Admin Center view of this contract shows the billing contact and Account Director.</p>
+      <a class="btn primary" href="<?= url ?>?page=admin" target="_top" style="text-decoration:none;display:inline-block">Open Admin Center</a>
+    </div>
+    <div class="panel" role="tabpanel" id="p-ord" aria-labelledby="t-ord" hidden>
+      <table><thead><tr><th>Order</th><th>Type</th><th>Date</th><th>Value</th></tr></thead><tbody><tr><td>TEST-ORDER-0001</td><td>Renewal</td><td>Feb 20, 2026</td><td>£10,000.00</td></tr></tbody></table>
+    </div>
+    <div class="panel" role="tabpanel" id="p-act" hidden aria-label="Activity log">
+      <h2 style="margin-top:0;font-size:19px">Activity log</h2>
+      <table><thead><tr><th>When</th><th>By</th><th>Change</th></tr></thead><tbody id="actBody"></tbody></table>
+    </div>
+
+    <footer><b style="color:var(--blue)">Linked<span style="background:var(--blue);color:#fff;border-radius:2px;padding:0 2px">in</span></b><span>Test prototype © 2026</span><b>Internal test use only</b></footer>
+  </main>
+</div>
+
+<dialog id="bcDlg" aria-labelledby="bTitle">
+  <form id="bcForm" novalidate>
+    <div class="dh"><h2 id="bTitle">Edit billing contact</h2><button class="link" type="button" id="bClose" aria-label="Close">✕</button></div>
+    <div class="db">
+      <label class="f">First name <input id="bFirst" maxlength="60" autocomplete="off" aria-required="true"></label>
+      <label class="f">Family name <input id="bLast" maxlength="60" autocomplete="off" aria-required="true"></label>
+      <label class="f">Email address <input id="bEmail" type="email" maxlength="200" autocomplete="off" aria-required="true"></label>
+      <label class="f">Phone <input id="bPhone" type="tel" maxlength="40" autocomplete="off"></label>
+      <p class="err" id="bErr" hidden role="alert"></p>
+    </div>
+    <div class="df"><button class="btn" type="button" id="bCancel">Cancel</button><button class="btn primary" type="submit" id="bSave">Save</button></div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ===== FAKE TEST DATA ONLY =====
+var $=function(i){return document.getElementById(i)};
+function el(t,a,x){var e=document.createElement(t);if(a)for(var k in a)e.setAttribute(k,a[k]);if(x!=null)e.textContent=x;return e}
+function toast(m){var t=$("toast");t.textContent=m;t.className="toast show";clearTimeout(toast.t);toast.t=setTimeout(function(){t.className="toast"},3200)}
+function dt(x){return new Date(x).toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}
+var HAS_GAS=(typeof google!=="undefined"&&google.script&&google.script.run);
+var BC={firstName:"Test",lastName:"Contact",name:"Test Contact",email:"test.contact@example.com",phone:"+44 0000 000001"};
+var lastKey=null;
+
+// tabs
+var TABS=[["t-sum","p-sum"],["t-con","p-con"],["t-bil","p-bil"],["t-adm","p-adm"],["t-ord","p-ord"]];
+function showPanel(pid){TABS.forEach(function(t){$(t[0]).setAttribute("aria-selected",String(t[1]===pid));$(t[1]).hidden=t[1]!==pid});$("p-act").hidden=pid!=="p-act";
+  [].slice.call(document.querySelectorAll("nav.side button")).forEach(function(b){if(b.id==="actBtn"?pid==="p-act":(b.textContent.indexOf("Contracts")===0&&pid!=="p-act"))b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")})}
+TABS.forEach(function(t){$(t[0]).addEventListener("click",function(){showPanel(t[1])})});
+$("actBtn").addEventListener("click",function(){showPanel("p-act")});
+[].slice.call(document.querySelectorAll("[data-na]")).forEach(function(b){b.addEventListener("click",function(e){e.preventDefault();toast(b.getAttribute("data-na")+" isn't available in this test prototype.")})});
+
+function render(st){
+  if(st&&st.billingContact){var b=st.billingContact;BC={firstName:b.firstName||(b.name||"").split(" ")[0],lastName:b.lastName||(b.name||"").split(" ").slice(1).join(" "),name:b.name||"",email:b.email,phone:b.phone||""};BC.name=(BC.firstName+" "+BC.lastName).trim()}
+  var key=BC.name+"|"+BC.email+"|"+BC.phone;var changed=lastKey!==null&&lastKey!==key;lastKey=key;
+  $("bcName").textContent=BC.name;$("bcEmail").textContent=BC.email;$("bcPhone").textContent=BC.phone||"—";
+  $("sBc").textContent=BC.name+" · "+BC.email;$("bInv").textContent=BC.email+" (Billing contact)";
+  if(st){var A=st.ad||{},on=!!(A.name&&!A.vacant&&!A.endDate&&A.active!==false),R=st.route||{};$("sAd").textContent=!A.name?"Being assigned":A.name+" ("+A.email+")"+(on?" · Active":" · Inactive - Admin Center messages go to "+(R.name||A.managerName||"manager")+(R.email?" ("+R.email+")":""));
+    var oc=(st.tickets||[]).filter(function(c){return c.status==="Active"});$("sCases").textContent=oc.length?oc.map(function(c){return c.id+" · "+c.title}).join("; "):"None";
+    var tb=$("actBody");tb.innerHTML="";var rows=(st.billingHistory||[]).map(function(h){return [h.at,h.by,"Billing contact: "+h.from+" → "+h.to]});
+    (st.notifications||[]).forEach(function(n){rows.push([n.sentAt,"System",n.subject.replace("[TEST] ","")+" (sent to billing contact)"])});
+    rows.sort(function(a,b){return a[0]<b[0]?1:-1});if(!rows.length)rows=[[new Date().toISOString(),"—","No changes yet"]];
+    rows.slice(0,15).forEach(function(r){var tr=el("tr");tr.appendChild(el("td",null,dt(r[0])));tr.appendChild(el("td",null,r[1]));tr.appendChild(el("td",null,r[2]));tb.appendChild(tr)})}
+  if(changed){var k=$("bcBlk");k.classList.remove("flash");void k.offsetWidth;k.classList.add("flash")}
+}
+function load(){if(!HAS_GAS){render(null);return}google.script.run.withSuccessHandler(render).withFailureHandler(function(){}).getState()}
+load();window.addEventListener("focus",load);setInterval(function(){if(!document.hidden)load()},20000);
+
+// edit billing contact
+$("bcEdit").addEventListener("click",function(){$("bFirst").value=BC.firstName;$("bLast").value=BC.lastName;$("bEmail").value=BC.email;$("bPhone").value=BC.phone;$("bErr").hidden=true;$("bcDlg").showModal();$("bFirst").focus()});
+["bClose","bCancel"].forEach(function(i){$(i).addEventListener("click",function(){$("bcDlg").close()})});
+$("bcForm").addEventListener("submit",function(e){e.preventDefault();
+  var f=$("bFirst").value.trim(),l=$("bLast").value.trim(),m=$("bEmail").value.trim(),ph=$("bPhone").value.trim(),err=$("bErr");
+  if(!f||!l){err.textContent="First name and family name are required.";err.hidden=false;return}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)){err.textContent="Enter a valid email address.";err.hidden=false;return}
+  var payload={firstName:f,lastName:l,email:m,phone:ph};$("bSave").disabled=true;
+  if(HAS_GAS){google.script.run.withSuccessHandler(function(st){$("bSave").disabled=false;$("bcDlg").close();render(st);toast("Billing contact saved. The opportunity and Admin Center are updated.")})
+     .withFailureHandler(function(x){$("bSave").disabled=false;err.textContent=(x&&x.message)||"Couldn't save. Try again.";err.hidden=false}).setBillingContact(payload,"CSP agent (test)")}
+  else{BC={firstName:f,lastName:l,name:f+" "+l,email:m,phone:ph};render(null);$("bSave").disabled=false;$("bcDlg").close();toast("Saved in this page only (open via Apps Script to update the opportunity).")}
+});
+</script>
+</body>
+</html>

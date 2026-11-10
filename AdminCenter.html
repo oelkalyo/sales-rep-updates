@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LinkedIn Admin Center - TEST-CONTRACT-0001</title>
+<style>
+:root{--bg:#f3f2ef;--card:#fff;--fg:#000000e6;--sub:#00000099;--border:#e8e8e8;--blue:#0a66c2;--blue-dk:#004182;--ok:#057642;--ok-bg:#e1f2e7;--bad:#cc1016;--warn:#915907}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--fg);font-size:15px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+a{color:var(--blue)}
+.skip{position:absolute;inset-inline-start:-999px}.skip:focus{inset-inline-start:8px;top:8px;background:#fff;padding:6px 10px;z-index:30}
+.top{background:#fff;height:64px;display:flex;align-items:center;padding:0 28px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:12}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--blue)}
+.brand .w{font-weight:800;font-size:30px;letter-spacing:-1px}
+.brand .in{background:var(--blue);color:#fff;font-weight:800;font-size:24px;border-radius:4px;padding:0 5px;line-height:32px;margin-inline-start:-6px}
+.brand .ac{font-size:28px;font-weight:400;margin-inline-start:6px}
+.top .right{margin-inline-start:auto;display:flex;gap:14px;align-items:center}
+.iconbtn{width:36px;height:36px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.iconbtn:hover{background:#0000000d}
+.ghost{width:38px;height:38px;border-radius:50%;background:#d0d5da;display:grid;place-items:center;overflow:hidden}
+.layout{display:flex;min-height:calc(100vh - 64px)}
+nav.side{width:300px;flex-shrink:0;background:#fff;border-inline-end:1px solid var(--border);padding:28px 0}
+.org{display:flex;gap:12px;padding:0 28px 30px}
+.org .logo{width:56px;height:56px;border-radius:6px;background:#111;display:grid;place-items:center;flex-shrink:0}
+.org b{display:block;font-size:17px}.org span{font-size:14px;word-break:break-all;color:var(--fg)}
+nav.side button{display:block;width:100%;text-align:start;border:0;background:transparent;padding:16px 28px;font-size:17px;font-weight:600;color:#000000bf;cursor:pointer;border-inline-start:4px solid transparent}
+nav.side button:hover{background:#0000000a}
+nav.side button[aria-current=page]{border-inline-start-color:#000000e6;color:var(--fg)}
+nav.side .back{padding:24px 28px;font-size:14px}
+main{flex:1;min-width:0}
+.phead{background:#fff;padding:22px 32px 0;position:sticky;top:64px;z-index:10;box-shadow:0 4px 6px -4px #00000026}
+.crumb{font-size:15px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:6px}
+.crumb button{border:0;background:none;padding:0;color:var(--sub);font-weight:600;cursor:pointer}
+.titlerow{display:flex;align-items:center;gap:16px;margin:8px 0 14px}
+h1{font-size:30px;margin:0;font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #00000099;color:#000000bf;background:#fff;border-radius:999px;padding:7px 20px;font-weight:600;cursor:pointer;white-space:nowrap;font-size:15px;text-decoration:none}
+.btn:hover{background:#0000000a;box-shadow:inset 0 0 0 1px #00000099}
+.btn.blue{border-color:var(--blue);color:var(--blue)}.btn.blue:hover{background:#0a66c214;box-shadow:inset 0 0 0 1px var(--blue)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.primary:hover{background:var(--blue-dk)}
+.btn.sm{padding:4px 14px;font-size:14px}
+.link{border:0;background:none;color:var(--blue);font-weight:600;cursor:pointer;padding:4px 0;font-size:15px}
+.link:hover{text-decoration:underline}
+.titlerow .btn{margin-inline-start:auto}
+.metaline{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border-top:1px solid var(--border);padding:14px 0 16px;font-size:16px}
+.metaline span{display:inline-flex;align-items:center;gap:8px}
+.metaline .dot{width:4px;height:4px;border-radius:50%;background:var(--fg)}
+.content{padding:28px 32px 60px;display:grid;gap:28px;max-width:1500px}
+.card{background:var(--card);border-radius:8px;box-shadow:0 0 0 1px #00000014;padding:28px 32px}
+.card h2{font-size:24px;margin:0;font-weight:600}
+.card .hrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.card .lede{color:var(--sub);margin:6px 0 20px}
+table{width:100%;border-collapse:collapse}
+th{font-weight:600;text-align:start;padding:14px 8px 18px;font-size:15px}
+td{padding:22px 8px;border-top:1px solid var(--border);vertical-align:middle}
+.card.flush{padding:28px 0 0}.card.flush .hrow,.card.flush h2{padding:0 32px}.card.flush .hrow h2{padding:0}.card.flush table th:first-child,.card.flush table td:first-child{padding-inline-start:32px}
+.card.flush table th:last-child,.card.flush table td:last-child{padding-inline-end:32px}
+.small{font-size:13px;color:var(--sub)}
+.status{display:inline-block;background:#d5ecd9;color:#1b5e2b;border-radius:4px;padding:3px 10px;font-weight:500}
+.st{display:inline-flex;align-items:center;gap:8px;font-weight:500}
+.st.ok{color:var(--ok)}.st.bad{color:var(--bad)}
+.mc{display:inline-flex;align-items:center;gap:10px}
+.kgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px 20px}
+.kgrid dt{font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.kgrid dd{margin:0;line-height:1.55}
+.sub-h{font-weight:600;font-size:17px;margin:28px 0 18px}
+hr.sep{border:0;border-top:1px solid var(--border);margin:28px 0 0}
+.tag{background:#ebebeb;border-radius:4px;padding:3px 8px;margin-inline-start:6px;font-size:14px}
+.help{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#333;color:#fff;font-size:12px;font-weight:700;border:0;cursor:help}
+.viewall{background:#f6f7f8;padding:18px 32px;border-top:1px solid var(--border);border-radius:0 0 8px 8px}
+.viewall button{border:0;background:none;color:#00000099;font-weight:600;cursor:pointer;font-size:16px}
+.av{border-radius:50%;background:#d0d5da;display:grid;place-items:center;font-weight:700;flex-shrink:0;color:#1f2a33}
+.admin{display:flex;gap:12px;align-items:center}
+.acts{display:flex;gap:40px;flex-wrap:wrap}
+/* Account director */
+.adcard{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;align-items:start}
+.adperson{display:flex;gap:18px;align-items:center}
+.adperson .av{width:80px;height:80px;font-size:26px;background:#cfe3f7;color:#0b3d6e}
+.adperson .nm{font-size:20px;font-weight:600}
+.adperson .rl{color:var(--sub)}
+.avail{display:inline-flex;align-items:center;gap:6px;font-size:14px;margin-top:6px;font-weight:500}
+.avail::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.avail.on{color:var(--ok)}.avail.off{color:#5e6c79}
+.adinfo{display:grid;grid-template-columns:110px 1fr;gap:10px 12px;margin:20px 0 0}
+.adinfo dt{font-weight:600}.adinfo dd{margin:0;word-break:break-word}
+.adact{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.adside h3{font-size:16px;margin:0 0 12px}
+.reqs{list-style:none;margin:0;padding:0;border:1px solid var(--border);border-radius:8px}
+.reqs li{padding:12px 14px;border-top:1px solid var(--border);font-size:14px}
+.reqs li:first-child{border-top:0}
+.reqs .r1{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.reqs .r2{color:var(--sub);margin-top:2px}
+.pill{display:inline-block;border-radius:999px;padding:1px 10px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill.sent{background:#e8f1fb;color:#0b4a8b}.pill.rep{background:var(--ok-bg);color:#0f5d23}
+.ribbon{display:flex;align-items:center;gap:14px;background:#eef3f8;border:1px solid #cfdeed;border-radius:8px;padding:12px 16px}
+.ribbon p{margin:0;flex:1}
+.view[hidden]{display:none}
+dialog{border:0;border-radius:10px;padding:0;width:min(580px,94vw);box-shadow:0 8px 32px #0000004d;background:#fff;color:#000000e6;color-scheme:light}
+dialog .btn{background:#fff;color:#000000bf;border-color:#00000099}dialog .btn.primary{background:#0a66c2;border-color:#0a66c2;color:#fff}dialog .iconbtn{color:#000000bf}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border)}
+.dh h2{margin:0;font-size:20px;font-weight:600}
+.db{padding:18px 22px;display:grid;gap:14px}
+.df{display:flex;justify-content:flex-end;gap:10px;padding:14px 22px;border-top:1px solid var(--border)}
+label.f{display:grid;gap:6px;font-weight:600;font-size:14px}
+.f input,.f select,.f textarea{border:1px solid #00000099;border-radius:4px;padding:9px 10px;font-weight:400;width:100%;background:#fff !important;color:#000000e6 !important;-webkit-text-fill-color:#000000e6;caret-color:#000;pointer-events:auto;user-select:text;-webkit-user-select:text}
+.f textarea{min-height:120px;resize:vertical}
+.radio{display:flex;gap:18px;flex-wrap:wrap;font-weight:400}
+.radio label{display:flex;gap:6px;align-items:center;white-space:nowrap}
+.radio input{width:auto}
+.err{color:var(--bad);font-size:13px;font-weight:600;margin:0}
+.toast{position:fixed;bottom:22px;inset-inline-start:50%;transform:translateX(-50%);background:#1d2226;color:#fff;padding:12px 18px;border-radius:8px;opacity:0;transition:opacity .2s;z-index:40;max-width:min(560px,92vw);pointer-events:none}
+.toast.show{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.tablewrap{overflow-x:auto}
+@media (max-width:1100px){.kgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.adcard{grid-template-columns:1fr}}
+@media (max-width:800px){.layout{flex-direction:column}nav.side{width:100%;padding:16px 0}.phead{position:static}.content,.phead{padding-inline:16px}.card{padding:20px}}
+@media (prefers-color-scheme: dark){:root{--bg:#000;--card:#1b1f23;--fg:#ffffffe6;--sub:#ffffffb3;--border:#38434f;--blue:#71b7fb;--ok:#7fc15e;--bad:#f5987e}.top,nav.side,.phead{background:#1b1f23}.btn{background:transparent;color:var(--fg);border-color:#ffffffb3}.btn.primary{color:#000}.viewall{background:#22272c}.ribbon{background:#1d2a38;border-color:#2f4c6a}.status{background:#1f3d27;color:#bfe6c9}.tag{background:#38434f}.adperson .av{background:#1f3d5c;color:#d6e8fb}}
+@media (forced-colors:active){.avail::before{background:CanvasText}}
+#ntfList article{border:1px solid #e8e8e8;border-radius:8px;padding:12px}
+#ntfList pre{white-space:pre-wrap;font:13px/1.5 ui-monospace,Menlo,monospace;margin:8px 0 0;color:#000000e6}
+.upd{font-size:13px;color:var(--sub);margin-top:2px}
+.vacnote{display:inline-block;background:#fef3c7;color:#78350f;border:1px solid #f59e0b;border-radius:999px;padding:1px 10px;font-size:13px;font-weight:600;margin-top:4px}
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <span class="brand" aria-label="LinkedIn Admin Center"><span class="w" aria-hidden="true">Linked</span><span class="in" aria-hidden="true">in</span><span class="ac" aria-hidden="true">Admin Center</span></span>
+  <span style="margin-inline-start:16px;background:#fde68a;color:#78350f;border:1px solid #f59e0b;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700">TEST DATA</span><div class="right">
+    <button class="iconbtn" type="button" id="bellBtn" aria-label="Notifications" style="position:relative"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 00-6 6v4l-2 3h16l-2-3V9a6 6 0 00-6-6zm-2 15a2 2 0 004 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span id="bellCount" hidden style="position:absolute;top:2px;right:2px;background:#cc1016;color:#fff;border-radius:999px;font-size:11px;font-weight:700;min-width:16px;height:16px;line-height:16px;padding:0 4px"></span></button>
+    <button class="iconbtn" type="button" id="helpTop" aria-label="Help"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><text x="12" y="17" font-size="14" text-anchor="middle" fill="#fff" font-weight="700">?</text></svg></button>
+    <div class="ghost" aria-label="Your profile" role="img"><svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><circle cx="19" cy="15" r="7" fill="#8c9aa6"/><path d="M5 36c2-8 8-11 14-11s12 3 14 11z" fill="#8c9aa6"/></svg></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="side" aria-label="Admin Center">
+    <div class="org">
+      <div class="logo" aria-hidden="true" style="color:#fff;font-weight:800;font-size:20px;background:#6b7280">TC</div>
+      <div><b>Test Company Ltd</b><span>test.admin@example.com</span></div>
+    </div>
+    <button type="button" data-view="overview">Overview</button>
+    <button type="button" data-view="contract" aria-current="page">Contracts &amp; orders</button>
+    <button type="button" data-view="transactions">Transactions</button>
+    <div class="back"><a href="<?= url ?>?page=csp" target="_top">← CSP</a><br><a href="<?= url ?>?page=opportunity" target="_top">← Dynamics opportunity</a><br><a href="<?= url ?>" target="_top">← Account Director (Dynamics users)</a></div>
+  </nav>
+
+  <main id="content" tabindex="-1">
+    <!-- ===== CONTRACT VIEW ===== -->
+    <div class="view" id="view-contract">
+      <div class="phead">
+        <div class="crumb"><button type="button" data-goto="overview">Contracts</button><span aria-hidden="true">❯</span></div>
+        <div class="titlerow">
+          <h1>TEST-CONTRACT-0001</h1>
+          <button class="btn blue" type="button" id="dlOrder"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M4 17v3h16v-3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download order form</button>
+        </div>
+        <div class="metaline">
+          <span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>2 years</span><i class="dot" aria-hidden="true"></i>
+          <span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 10h16" stroke="currentColor" stroke-width="2"/></svg>Billed quarterly</span><i class="dot" aria-hidden="true"></i>
+          <span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h7l2 2h9v11H3z" fill="currentColor"/></svg>2 products</span><i class="dot" aria-hidden="true"></i>
+          <span><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg>£10,000.00 total value</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="ribbon" role="region" aria-label="Your Account Director">
+          <div class="av" style="width:44px;height:44px;background:#cfe3f7;color:#0b3d6e" aria-hidden="true" data-ad="initials"></div>
+          <p><span id="bnText"><b data-ad="name"></b>, your LinkedIn Account Director, manages your account (all contracts). Contact them about renewals, adding products or pricing.</span><span class="upd" id="adUpdated" style="display:block"></span></p>
+          <button class="btn primary sm" type="button" data-contact="">Contact</button>
+        </div>
+
+        <section class="card flush" aria-labelledby="h-ov">
+          <h2 id="h-ov" style="margin-bottom:18px">Overview</h2>
+          <div class="tablewrap"><table>
+            <thead><tr><th>Description</th><th>Status</th><th>Start - end date</th><th>PO number</th><th>Payment method</th><th>Value</th><th><span class="sr">Actions</span></th></tr></thead>
+            <tbody><tr>
+              <td>TEST-CONTRACT-0001<div class="small">Renewal · <span style="text-decoration:underline dotted">2 products</span></div></td>
+              <td><span class="status">Active</span></td>
+              <td>Mar 1, 2026 - Feb 29, 2028</td>
+              <td id="poCell">-</td>
+              <td><span class="mc"><svg width="30" height="14" viewBox="0 0 30 14" aria-hidden="true"><rect width="30" height="14" rx="2" fill="#6b7280"/><text x="15" y="10.5" font-size="7.5" font-weight="800" text-anchor="middle" fill="#fff" font-family="Arial">TEST</text></svg>Test card ‐ 0000</span></td>
+              <td>£10,000.00</td>
+              <td><div style="display:flex;gap:22px;align-items:center"><button class="iconbtn" type="button" id="dlRow" aria-label="Download order form" style="color:var(--blue)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M4 17v3h16v-3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="link" type="button" id="addPo">Add PO</button></div></td>
+            </tr></tbody>
+          </table></div>
+        </section>
+
+        <section class="card flush" aria-labelledby="h-prod">
+          <div class="hrow"><h2 id="h-prod">Products</h2><button class="btn" type="button" id="buyMore">Purchase more</button></div>
+          <div class="tablewrap"><table>
+            <thead><tr><th>Product name</th><th>Quantity purchased</th><th>Utilized</th></tr></thead>
+            <tbody id="prodBody"></tbody>
+          </table></div>
+        </section>
+
+        <section class="card" aria-labelledby="h-ren">
+          <h2 id="h-ren">Renewal information</h2>
+          <p class="lede">Parent and its add-ons renew into 1 consolidated contract.</p>
+          <dl class="kgrid">
+            <div><dt>Contract start date</dt><dd>March 1, 2026</dd></div>
+            <div><dt>Date of renewal</dt><dd>February 29, 2028</dd></div>
+            <div><dt>Auto-renew</dt><dd><span class="st"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#cc1016"/><path d="M8.5 8.5l7 7m0-7l-7 7" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>No</span></dd></div>
+            <div><dt>Renewal term</dt><dd>1 year</dd></div>
+          </dl>
+        </section>
+
+        <section class="card" aria-labelledby="h-bill">
+          <h2 id="h-bill">Billing information</h2>
+          <p class="lede" style="margin-bottom:0"><button class="link" type="button" id="billChange">Click here</button> to request a change in billing frequency or payment method</p>
+          <div class="sub-h">Company information</div>
+          <dl class="kgrid">
+            <div><dt>Bill to address</dt><dd>TEST COMPANY LTD<br>1 Test Street, Testville, United Kingdom, TE1 1ST<br>Testville<br>TE1 1ST<br>United Kingdom</dd></div>
+            <div><dt>Ship to address</dt><dd>TEST COMPANY LTD<br>1 Test Street, Testville, United Kingdom, TE1 1ST<br>Testville<br>TE1 1ST<br>United Kingdom</dd></div>
+            <div><dt>Tax registration ID</dt><dd>TEST-TAX-0000</dd></div>
+            <div><dt>Tax exemption details</dt><dd>-</dd></div>
+          </dl>
+          <hr class="sep">
+          <div class="sub-h">Contacts</div>
+          <dl class="kgrid">
+            <div><dt>Primary contact <button class="help" type="button" aria-label="About primary contact" title="Main person LinkedIn contacts about this contract">?</button></dt><dd>Test Contact<br><span style="color:var(--sub)">test.contact@example.com</span></dd></div>
+            <div><dt>Billing contact <button class="help" type="button" aria-label="About billing contact" title="Person who receives billing communications">?</button></dt><dd><span id="bcName">Test Contact</span><br><span style="color:var(--sub)" id="bcEmail">test.contact@example.com</span><br><button class="link" type="button" id="bcEdit">Edit billing contact</button><div class="small" id="bcUpd"></div></dd></div>
+            <div><dt>Invoice recipients <button class="help" type="button" aria-label="About invoice recipients" title="Emails that receive invoices">?</button></dt><dd><span id="bcInv">test.contact@example.com</span> <span class="tag">Billing Contact</span></dd></div>
+            <div><dt>Account Director <button class="help" type="button" aria-label="About Account Director" title="Your LinkedIn contact for your account (all contracts)">?</button></dt><dd id="adContactDd"><span data-ad="name"></span><br><a data-ad="email" style="color:var(--sub)"></a></dd></div>
+          </dl>
+          <hr class="sep">
+          <div class="sub-h">Payment information</div>
+          <dl class="kgrid">
+            <div><dt>Billing frequency</dt><dd>Quarterly</dd></div>
+            <div><dt>Payment term</dt><dd>Immediate</dd></div>
+            <div><dt>Payment method</dt><dd><span class="mc"><svg width="30" height="14" viewBox="0 0 30 14" aria-hidden="true"><rect width="30" height="14" rx="2" fill="#6b7280"/><text x="15" y="10.5" font-size="7.5" font-weight="800" text-anchor="middle" fill="#fff" font-family="Arial">TEST</text></svg>Test card - 0000</span></dd></div>
+            <div><dt>Invoice date</dt><dd>1 of Mar, Jun, Sep, and Dec</dd></div>
+            <div><dt>Invoice currency</dt><dd>GBP</dd></div>
+            <div><dt>Invoice language</dt><dd>English (United States)</dd></div>
+            <div><dt>Special instructions (optional)</dt><dd>-</dd></div>
+          </dl>
+        </section>
+
+        <section class="card flush" aria-labelledby="h-tx">
+          <h2 id="h-tx" style="margin-bottom:18px">Transactions</h2>
+          <div class="tablewrap"><table>
+            <thead><tr><th>Invoice number</th><th>Status</th><th>Issue date</th><th>Due date</th><th>Payment method</th><th>Total</th></tr></thead>
+            <tbody id="txBody"></tbody>
+          </table></div>
+          <div class="viewall"><button type="button" data-goto="transactions">View all →</button></div>
+        </section>
+
+        <section class="card flush" aria-labelledby="h-adm">
+          <div class="hrow"><h2 id="h-adm">Admins for this contract</h2><button class="btn" type="button" id="inviteBtn">Invite admin</button></div>
+          <div class="tablewrap"><table>
+            <thead><tr><th>Admin details</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead>
+            <tbody id="admBody"></tbody>
+          </table></div>
+          <div style="padding:20px 32px" id="admCount"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ===== OVERVIEW VIEW ===== -->
+    <div class="view" id="view-overview" hidden>
+      <div class="phead"><div class="titlerow"><h1>Contracts</h1></div></div>
+      <div class="content">
+        <section class="card flush" aria-label="Contracts list">
+          <div class="tablewrap"><table>
+            <thead><tr><th>Contract</th><th>Status</th><th>Start - end date</th><th>Value</th><th>Account Director</th></tr></thead>
+            <tbody><tr><td><button class="link" type="button" data-goto="contract">TEST-CONTRACT-0001</button><div class="small">Renewal · 2 products</div></td><td><span class="status">Active</span></td><td>Mar 1, 2026 - Feb 29, 2028</td><td>£10,000.00</td><td id="ovAdCell"><span data-ad="name"></span></td></tr></tbody>
+          </table></div>
+        </section>
+
+        <!-- Account team (account level) -->
+        <section class="card" aria-labelledby="h-team" id="teamCard">
+          <div class="hrow"><h2 id="h-team">Your LinkedIn account team</h2></div>
+          <div class="adcard">
+            <div>
+              <div class="adperson">
+                <div class="av" aria-hidden="true" data-ad="initials"></div>
+                <div>
+                  <div class="nm" data-ad="name"></div>
+                  <div class="rl" id="adRole">Account Director (test)</div>
+                  <div class="avail" id="adAvail"></div>
+                </div>
+              </div>
+              <dl class="adinfo">
+                <dt>Email</dt><dd><a data-ad="email"></a></dd>
+                <dt>Phone</dt><dd data-ad="phone"></dd>
+                <dt>Office</dt><dd data-ad="office"></dd>
+                <dt>Languages</dt><dd data-ad="lang"></dd>
+                <dt>Responds</dt><dd>Within 1 business day</dd>
+              </dl>
+              <div class="adact">
+                <button class="btn primary" type="button" data-contact="">Send a message</button>
+                <button class="btn blue" type="button" id="bookBtn">Request a call</button>
+                <a class="btn" id="adMailto" target="_blank" rel="noopener">Email</a>
+                <button class="link" type="button" id="copyBtn" style="margin-inline-start:6px">Copy email</button>
+              </div>
+              <p class="small" id="adRouteNote" style="margin:12px 0 0"></p>
+            </div>
+            <div class="adside">
+              <h3>Your requests</h3>
+              <ul class="reqs" id="reqList"></ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ===== TRANSACTIONS VIEW ===== -->
+    <div class="view" id="view-transactions" hidden>
+      <div class="phead"><div class="titlerow"><h1>Transactions</h1></div></div>
+      <div class="content">
+        <section class="card flush" aria-label="All transactions">
+          <div class="tablewrap"><table>
+            <thead><tr><th>Invoice number</th><th>Status</th><th>Issue date</th><th>Due date</th><th>Payment method</th><th>Total</th><th><span class="sr">Actions</span></th></tr></thead>
+            <tbody id="txAllBody"></tbody>
+          </table></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Contact dialog -->
+<dialog id="contactDlg" aria-labelledby="cTitle">
+  <form id="contactForm" novalidate>
+    <div class="dh"><h2 id="cTitle">Contact your Account Director</h2><button class="iconbtn" type="button" id="cClose" aria-label="Close">✕</button></div>
+    <div class="db">
+      <p style="margin:0" id="cTo"></p>
+      <label class="f">Topic
+        <select id="cTopic"><option>Renewal</option><option>Purchase more products or seats</option><option>Pricing or quote</option><option>Billing frequency or payment method</option><option>Invoice question</option><option>Other</option></select>
+      </label>
+      <label class="f">Subject <input id="cSubject" aria-required="true"></label>
+      <label class="f">Message <textarea id="cMsg" aria-required="true"></textarea></label>
+      <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;font-size:14px;margin-bottom:6px">Preferred contact</legend>
+        <div class="radio"><label><input type="radio" name="pref" value="Email" checked> Email</label><label><input type="radio" name="pref" value="Phone call"> Phone call</label><label><input type="radio" name="pref" value="Video meeting"> Video meeting</label></div>
+      </fieldset>
+      <p class="err" id="cErr" hidden role="alert">Add a subject and a message.</p>
+    </div>
+    <div class="df"><a class="btn" id="cMail" href="#" target="_blank" rel="noopener">Open in my email</a><button class="btn primary" type="submit">Send message</button></div>
+  </form>
+</dialog>
+
+<!-- Call dialog -->
+<dialog id="callDlg" aria-labelledby="kTitle">
+  <form id="callForm" novalidate>
+    <div class="dh"><h2 id="kTitle">Request a call</h2><button class="iconbtn" type="button" id="kClose" aria-label="Close">✕</button></div>
+    <div class="db">
+      <label class="f">Preferred date <input type="date" id="kDate" aria-required="true"></label>
+      <label class="f">Time window (UK time)<select id="kTime"><option>09:00 – 11:00</option><option>11:00 – 13:00</option><option>14:00 – 16:00</option><option>16:00 – 18:00</option></select></label>
+      <label class="f">Phone number <input id="kPhone" type="tel" aria-required="true"></label>
+      <label class="f">What would you like to discuss? <textarea id="kNote"></textarea></label>
+      <p class="err" id="kErr" hidden role="alert">Choose a date and add a phone number.</p>
+    </div>
+    <div class="df"><button class="btn" type="button" id="kCancel">Cancel</button><button class="btn primary" type="submit">Request call</button></div>
+  </form>
+</dialog>
+
+<!-- Add PO dialog -->
+<dialog id="poDlg" aria-labelledby="pTitle">
+  <form id="poForm" novalidate>
+    <div class="dh"><h2 id="pTitle">Add PO number</h2><button class="iconbtn" type="button" id="pClose" aria-label="Close">✕</button></div>
+    <div class="db"><label class="f">PO number <input id="pNum" aria-required="true" maxlength="40"></label><p class="err" id="pErr" hidden role="alert">Enter a PO number.</p></div>
+    <div class="df"><button class="btn" type="button" id="pCancel">Cancel</button><button class="btn primary" type="submit">Save</button></div>
+  </form>
+</dialog>
+
+<!-- Invite admin dialog -->
+<dialog id="invDlg" aria-labelledby="iTitle">
+  <form id="invForm" novalidate>
+    <div class="dh"><h2 id="iTitle">Invite admin</h2><button class="iconbtn" type="button" id="iClose" aria-label="Close">✕</button></div>
+    <div class="db"><label class="f">Email address <input id="iEmail" type="email" aria-required="true"></label><p class="err" id="iErr" hidden role="alert">Enter a valid email address.</p></div>
+    <div class="df"><button class="btn" type="button" id="iCancel">Cancel</button><button class="btn primary" type="submit">Send invite</button></div>
+  </form>
+</dialog>
+
+<dialog id="sentDlg" aria-labelledby="sTitle">
+  <div class="dh"><h2 id="sTitle">Message sent</h2><button class="iconbtn" type="button" id="sClose" aria-label="Close">✕</button></div>
+  <div class="db" id="sentBody"></div>
+  <div class="df"><button class="btn primary" type="button" id="sOk">Done</button></div>
+</dialog>
+<dialog id="ntfDlg" aria-labelledby="nTitle">
+  <div class="dh"><h2 id="nTitle">Notifications sent to billing contact</h2><button class="iconbtn" type="button" id="nClose" aria-label="Close">✕</button></div>
+  <div class="db" id="ntfList"></div>
+</dialog>
+<dialog id="bcDlg" aria-labelledby="bTitle">
+  <form id="bcForm" novalidate>
+    <div class="dh"><h2 id="bTitle">Edit billing contact</h2><button class="iconbtn" type="button" id="bClose" aria-label="Close">✕</button></div>
+    <div class="db">
+      <p class="small" style="margin:0">Changes are saved to contract TEST-CONTRACT-0001 and update the Dynamics opportunity.</p>
+      <label class="f">First name <input id="bFirst" aria-required="true" maxlength="60" autocomplete="off"></label>
+      <label class="f">Last name <input id="bLast" aria-required="true" maxlength="60" autocomplete="off"></label>
+      <label class="f">Email address <input id="bEmail" type="email" aria-required="true" maxlength="200" autocomplete="off"></label>
+      <p class="err" id="bErr" hidden role="alert"></p>
+    </div>
+    <div class="df"><button class="btn" type="button" id="bCancel">Cancel</button><button class="btn primary" type="submit" id="bSave">Save</button></div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ---------- data (edit here) ----------
+var AD={name:"Test Account Director",initials:"TA",email:"test.accountdirector@example.com",phone:"+44 0000 000000",office:"Test Office, UK (GMT)",lang:"English",hoursUK:[9,18]};
+var CONTRACT_ID="TEST-CONTRACT-0001";
+var PRODUCTS=[{name:"Recruiter Corporate",qty:5,util:80},{name:"Job Slot",qty:3,util:67}];
+var TX=[
+ {no:"TEST-INV-0003",status:"Overdue",issue:"Sep 1, 2026",due:"Sep 1, 2026",pm:"-",total:"£1,250.00"},
+ {no:"TEST-INV-0002",status:"Paid",issue:"Jun 1, 2026",due:"Jun 1, 2026",pm:"-",total:"£1,250.00"},
+ {no:"TEST-INV-0001",status:"Paid",issue:"Mar 1, 2026",due:"Mar 1, 2026",pm:"-",total:"£1,250.00"}];
+var ADMINS=[{name:"",email:"",status:"Invited",since:"Oct 22, 2026"},{name:"Test Contact",email:"test.contact@example.com",status:"Active",since:"Mar 2, 2026"}];
+var requests=[];
+
+// ---------- helpers ----------
+var $=function(i){return document.getElementById(i)};
+function el(t,a,x){var e=document.createElement(t);if(a)for(var k in a){if(k==="class")e.className=a[k];else e.setAttribute(k,a[k])}if(x!=null)e.textContent=x;return e}
+function toast(m){var t=$("toast");t.textContent=m;t.className="toast show";clearTimeout(toast.t);toast.t=setTimeout(function(){t.className="toast"},3400)}
+function fmtToday(){return new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}
+var SVG_OK='<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#057642"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var SVG_BAD='<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l11 11-11 11L1 12z" fill="#cc1016"/><path d="M12 6.5v7" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.5" fill="#fff"/></svg>';
+var SVG_CLOCK='<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+function stCell(s){var sp=el("span",{"class":"st "+(s==="Paid"||s==="Active"?"ok":"bad")});sp.innerHTML=s==="Paid"||s==="Active"?SVG_OK:SVG_BAD;sp.appendChild(document.createTextNode(s));return sp}
+
+// ---------- account director ----------
+function ukHour(){try{return Number(new Intl.DateTimeFormat("en-GB",{hour:"2-digit",hour12:false,timeZone:"Europe/London"}).format(new Date()))}catch(e){return new Date().getUTCHours()}}
+function fillAD(){
+  [].slice.call(document.querySelectorAll("[data-ad]")).forEach(function(n){var k=n.getAttribute("data-ad");
+    if(k==="email"){n.textContent=AD.email;n.href="mailto:"+AD.email}else n.textContent=AD[k]});
+  var day=new Date().getDay(),h=ukHour(),on=day>0&&day<6&&h>=AD.hoursUK[0]&&h<AD.hoursUK[1];
+  var a=$("adAvail");a.className="avail "+(on?"on":"off");a.textContent=on?"Available now":"Away · back next business day";
+  $("adMailto").href="mailto:"+AD.email+"?subject="+encodeURIComponent("["+CONTRACT_ID+"] ");
+}
+fillAD();
+
+// ---------- products ----------
+PRODUCTS.forEach(function(p){var r=el("tr");r.appendChild(el("td",null,p.name));r.appendChild(el("td",null,String(p.qty)));r.appendChild(el("td",null,p.util+"%"));$("prodBody").appendChild(r)});
+
+// ---------- transactions ----------
+function txRow(t,withAct){var r=el("tr");r.appendChild(el("td",null,t.no));var s=el("td");s.appendChild(stCell(t.status));r.appendChild(s);
+  [t.issue,t.due,t.pm,t.total].forEach(function(x){r.appendChild(el("td",null,x))});
+  if(withAct){var a=el("td");var b=el("button",{"class":"link",type:"button"},"Ask about this invoice");b.addEventListener("click",function(){openContact({topic:"Invoice question",subject:"Question about invoice "+t.no,msg:"Hi "+AD.name.split(" ")[0]+",\n\nI have a question about invoice "+t.no+" ("+t.total+", due "+t.due+", status: "+t.status+").\n\n"})});a.appendChild(b);r.appendChild(a)}
+  return r}
+TX.slice(0,3).forEach(function(t){$("txBody").appendChild(txRow(t,false))});
+TX.forEach(function(t){$("txAllBody").appendChild(txRow(t,true))});
+
+// ---------- admins ----------
+function ghostAv(){var d=el("div",{"class":"av","aria-hidden":"true",style:"width:34px;height:34px"});d.innerHTML='<svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="13" r="6" fill="#8c9aa6"/><path d="M5 32c2-7 7-9 12-9s10 2 12 9z" fill="#8c9aa6"/></svg>';return d}
+function renderAdmins(){var tb=$("admBody");tb.innerHTML="";
+  ADMINS.forEach(function(a,i){var r=el("tr");var c1=el("td");var w=el("div",{"class":"admin"});
+    w.appendChild(a.name?el("div",{"class":"av","aria-hidden":"true",style:"width:34px;height:34px;font-size:12px;background:#3b4a56;color:#fff"},a.name.split(" ").map(function(x){return x[0]}).join("")):ghostAv());
+    var nm=el("div");if(a.name)nm.appendChild(el("div",{style:"font-weight:600"},a.name));if(a.email)nm.appendChild(el("div",{"class":"small"},a.email));if(!a.name&&!a.email)nm.appendChild(el("span",{"class":"sr"},"Invited admin"));
+    w.appendChild(nm);c1.appendChild(w);r.appendChild(c1);
+    var c2=el("td");var st=el("div",{"class":"admin"});
+    if(a.status==="Invited"){var ic=el("span",{"aria-hidden":"true"});ic.innerHTML=SVG_CLOCK;st.appendChild(ic);var tx=el("div");tx.appendChild(el("div",null,"Invited"));tx.appendChild(el("div",{"class":"small"},"On "+a.since));st.appendChild(tx)}
+    else{var ic2=el("span",{"aria-hidden":"true"});ic2.innerHTML=SVG_OK;st.appendChild(ic2);var tx2=el("div");tx2.appendChild(el("div",{style:"color:var(--ok)"},"Active"));tx2.appendChild(el("div",{"class":"small"},"Since "+a.since));st.appendChild(tx2)}
+    c2.appendChild(st);r.appendChild(c2);
+    var c3=el("td");var acts=el("div",{"class":"acts"});
+    if(a.status==="Invited"){
+      var b1=el("button",{"class":"link",type:"button"},"Cancel invitation");b1.addEventListener("click",function(){ADMINS.splice(i,1);renderAdmins();toast("Invitation cancelled")});
+      var b2=el("button",{"class":"link",type:"button"},"Re-invite");b2.addEventListener("click",function(){a.since=fmtToday();renderAdmins();toast("Invitation sent again")});
+      acts.appendChild(b1);acts.appendChild(b2)}
+    else{var b3=el("button",{"class":"link",type:"button"},"Remove Admin");b3.addEventListener("click",function(){
+      if(ADMINS.filter(function(x){return x.status==="Active"}).length<=1){toast("A contract needs at least one active admin.");return}
+      ADMINS.splice(i,1);renderAdmins();toast(a.name+" removed as admin")});acts.appendChild(b3)}
+    c3.appendChild(acts);r.appendChild(c3);tb.appendChild(r)});
+  $("admCount").textContent="Showing 1-"+ADMINS.length+" of "+ADMINS.length}
+renderAdmins();
+
+// ---------- requests ----------
+// requests = messages sent from this Admin Center (newest first). Each one is emailed to the
+// Account Director, or diverted to the Account Director's manager when the Account Director is inactive.
+function renderReqs(){var ul=$("reqList");ul.innerHTML="";
+  if(!requests.length){ul.appendChild(el("li",{style:"color:var(--sub)"},"No messages or call requests yet."));return}
+  requests.slice(0,6).forEach(function(r){var li=el("li");var a=el("div",{"class":"r1"});a.appendChild(el("span",null,r.subject));a.appendChild(el("span",{"class":"pill "+(r.diverted?"rep":"sent")},r.diverted?"Sent to manager":"Sent"));li.appendChild(a);
+    li.appendChild(el("div",{"class":"r2"},r.id+" · to "+r.to.name+" · reply by "+String(r.pref).toLowerCase()+" · "+new Date(r.at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})));ul.appendChild(li)})}
+renderReqs();
+// Local copy of the routing rule (used only when the page is opened outside the web app).
+function adActive(ad){return !!(ad&&!ad.vacant&&ad.name&&!ad.endDate&&ad.active!==false)}
+function routeOf(ad){if(adActive(ad))return {diverted:false,name:ad.name,email:ad.email,role:"Account Director",reason:""};
+  var why=(ad&&ad.name?ad.name:"The Account Director")+" is inactive"+(ad&&ad.endDate?" (end date "+ad.endDate+")":"");
+  if(ad&&ad.managerEmail)return {diverted:true,name:ad.managerName||"Manager",email:ad.managerEmail,role:"Manager of the Account Director",reason:why};
+  return {diverted:true,name:"Billing Support",email:"billing-support@example.com",role:"Billing Support",reason:why+"; no manager on record"}}
+var LOCAL_AD={name:"Test Account Director",email:"test.accountdirector@example.com",active:true,endDate:"",managerName:"Test Manager 1",managerEmail:"test.manager1@example.com"};
+function sendMsg(m,done,fail){
+  if(HAS_GAS){google.script.run.withSuccessHandler(function(st){applyState(st);done(st.lastMessage)}).withFailureHandler(function(e){fail((e&&e.message)||"Couldn't send. Try again.")}).sendCustomerMessage(m);return}
+  var r=routeOf(LOCAL_AD);var x={id:"REQ-"+(10481+requests.length),at:new Date().toISOString(),topic:m.topic,pref:m.pref,subject:m.subject,to:{name:r.name,email:r.email,role:r.role},intendedFor:{name:LOCAL_AD.name},diverted:r.diverted,reason:r.reason,delivered:"local test - not sent"};
+  requests.unshift(x);renderReqs();done(x)}
+function showSent(x){var b=$("sentBody");b.innerHTML="";
+  b.appendChild(el("p",{style:"margin:0"},x.diverted?"Your Account Director is not available right now, so your message was sent to their manager:":"Your message was sent to your Account Director:"));
+  var d=el("div",{style:"font-weight:600;font-size:17px"},x.to.name);b.appendChild(d);b.appendChild(el("div",{"class":"small"},x.to.role+" · "+x.to.email));
+  if(x.diverted&&x.reason)b.appendChild(el("p",{"class":"small",style:"margin:0"},x.reason+". They will reply until a new Account Director is assigned."));
+  b.appendChild(el("p",{"class":"small",style:"margin:0"},"Reference "+x.id+" · "+x.subject+" · "+x.delivered));
+  $("sentDlg").showModal()}
+
+// ---------- navigation ----------
+var navBtns=[].slice.call(document.querySelectorAll("nav.side button[data-view]"));
+function show(v){navBtns.forEach(function(b){if(b.getAttribute("data-view")===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+  ["contract","overview","transactions"].forEach(function(x){$("view-"+x).hidden=x!==v});window.scrollTo(0,0);$("content").focus()}
+navBtns.forEach(function(b){b.addEventListener("click",function(){show(b.getAttribute("data-view"))})});
+[].slice.call(document.querySelectorAll("[data-goto]")).forEach(function(b){b.addEventListener("click",function(){show(b.getAttribute("data-goto"))})});
+
+// ---------- dialogs (generic) ----------
+function wireClose(dlg,ids){ids.forEach(function(i){$(i).addEventListener("click",function(){$(dlg).close()})})}
+
+// contact
+function syncMail(){$("cMail").href="mailto:"+AD.email+"?subject="+encodeURIComponent("["+CONTRACT_ID+"] "+$("cSubject").value)+"&body="+encodeURIComponent($("cMsg").value+"\n\n—\nContract: "+CONTRACT_ID+"\nCompany: Test Company Ltd\nTopic: "+$("cTopic").value)}
+function openContact(pre){pre=pre||{};var R=ROUTE||routeOf(LOCAL_AD);$("cTo").textContent="To: "+R.name+" ("+(R.diverted?R.role+", covering while your Account Director is unavailable":"Account Director")+") · "+R.email;$("cTitle").textContent=R.diverted?"Contact your account team":"Contact your Account Director";
+  $("cTopic").value=pre.topic||"Renewal";$("cSubject").value=pre.subject||"";$("cMsg").value=pre.msg||"";$("cErr").hidden=true;syncMail();$("contactDlg").showModal();(pre.subject?$("cMsg"):$("cSubject")).focus()}
+[].slice.call(document.querySelectorAll("[data-contact]")).forEach(function(b){b.addEventListener("click",function(){openContact()})});
+["cTopic","cSubject","cMsg"].forEach(function(i){["input","change"].forEach(function(ev){$(i).addEventListener(ev,function(){syncMail();if($("cSubject").value.trim()&&$("cMsg").value.trim())$("cErr").hidden=true})})});
+wireClose("contactDlg",["cClose"]);
+$("contactForm").addEventListener("submit",function(e){e.preventDefault();
+  if(!$("cSubject").value.trim()||!$("cMsg").value.trim()){$("cErr").textContent="Add a subject and a message.";$("cErr").hidden=false;return}
+  var pref=document.querySelector("input[name=pref]:checked").value,btn=e.submitter||document.querySelector("#contactForm button[type=submit]");btn.disabled=true;
+  sendMsg({topic:$("cTopic").value,subject:$("cSubject").value.trim(),message:$("cMsg").value.trim(),pref:pref},
+    function(x){btn.disabled=false;$("contactDlg").close();showSent(x)},
+    function(err){btn.disabled=false;$("cErr").textContent=err;$("cErr").hidden=false})});
+$("sClose").addEventListener("click",function(){$("sentDlg").close()});$("sOk").addEventListener("click",function(){$("sentDlg").close()});
+
+// call
+$("bookBtn").addEventListener("click",function(){var d=new Date();d.setDate(d.getDate()+1);$("kDate").min=d.toISOString().slice(0,10);["kDate","kPhone","kNote"].forEach(function(i){$(i).value=""});$("kErr").hidden=true;$("callDlg").showModal()});
+wireClose("callDlg",["kClose","kCancel"]);
+$("callForm").addEventListener("submit",function(e){e.preventDefault();if(!$("kDate").value||!$("kPhone").value.trim()){$("kErr").textContent="Choose a date and add a phone number.";$("kErr").hidden=false;return}
+  var dd=new Date($("kDate").value+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  var subj="Call on "+dd+", "+$("kTime").value+" (UK time)";
+  sendMsg({topic:"Call request",subject:subj,pref:"Phone call",message:"Please call me on "+$("kPhone").value.trim()+".\nPreferred: "+dd+", "+$("kTime").value+" (UK time).\n\n"+($("kNote").value.trim()||"No details added.")},
+    function(x){$("callDlg").close();showSent(x)},function(err){$("kErr").textContent=err;$("kErr").hidden=false})});
+
+// prefilled entry points
+$("buyMore").addEventListener("click",function(){openContact({topic:"Purchase more products or seats",subject:"Purchase more – "+CONTRACT_ID,msg:"Hi "+AD.name.split(" ")[0]+",\n\nWe'd like to add to our contract "+CONTRACT_ID+".\nCurrent products: Recruiter Corporate (5, 80% used), Job Slot (3, 67% used).\n\nWhat we need: \n\nThanks"})});
+$("billChange").addEventListener("click",function(){openContact({topic:"Billing frequency or payment method",subject:"Change billing for "+CONTRACT_ID,msg:"Hi,\n\nWe'd like to change our billing frequency / payment method.\nCurrent: Quarterly, Test card - 0000.\nRequested change: \n\n"})});
+
+// PO
+$("addPo").addEventListener("click",function(){$("pNum").value=$("poCell").textContent==="-"?"":$("poCell").textContent;$("pErr").hidden=true;$("poDlg").showModal()});
+wireClose("poDlg",["pClose","pCancel"]);
+$("poForm").addEventListener("submit",function(e){e.preventDefault();var v=$("pNum").value.trim();if(!v){$("pErr").hidden=false;return}$("poCell").textContent=v;$("addPo").textContent="Edit PO";$("poDlg").close();toast("PO number saved")});
+
+// invite admin
+$("inviteBtn").addEventListener("click",function(){$("iEmail").value="";$("iErr").hidden=true;$("invDlg").showModal()});
+wireClose("invDlg",["iClose","iCancel"]);
+$("invForm").addEventListener("submit",function(e){e.preventDefault();var v=$("iEmail").value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){$("iErr").hidden=false;return}
+  ADMINS.unshift({name:"",email:v,status:"Invited",since:fmtToday()});renderAdmins();$("invDlg").close();toast("Invitation sent to "+v)});
+
+// downloads (prototype)
+["dlOrder","dlRow"].forEach(function(i){$(i).addEventListener("click",function(){toast("Order form download isn't available in this prototype.")})});
+$("helpTop").addEventListener("click",function(){show("overview");$("teamCard").scrollIntoView({behavior:"smooth",block:"start"});toast("Need help? Contact "+AD.name+" from your account team.")});
+
+// copy email
+$("copyBtn").addEventListener("click",function(){var ok=function(){toast("Email copied: "+AD.email)};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(AD.email).then(ok,function(){prompt("Copy the email address:",AD.email)})}else{prompt("Copy the email address:",AD.email)}});
+
+// ===== live Account Director from Dynamics =====
+var HAS_GAS=(typeof google!=="undefined"&&google.script&&google.script.run);
+var NOTIFS=[];
+var ROUTE=null;
+var ORIG_BANNER=null;
+function applyState(st){if(!st)return;
+  if(ORIG_BANNER===null)ORIG_BANNER=$("bnText").innerHTML;
+  var ad=st.ad||{},R=st.route||routeOf(ad);ROUTE=R;
+  var when=ad.updatedAt?new Date(ad.updatedAt).toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+  var nm=document.querySelector(".adperson .nm"),dd=$("adContactDd");
+  if(R.diverted){
+    // Account Director inactive (End Date in Dynamics): show the person messages are diverted to.
+    AD.name=R.name;AD.initials=R.name.split(" ").map(function(x){return x[0]}).join("").slice(0,2).toUpperCase();AD.email=R.email;AD.phone=ad.managerPhone||"-";AD.office=ad.office||"-";AD.lang=ad.lang||"English";fillAD();
+    var b=$("bnText");b.innerHTML="";b.appendChild(el("b",null,"Your Account Director"+(ad.name?", "+ad.name+",":"")+" is no longer available."));
+    b.appendChild(document.createTextNode(" Until a new Account Director is assigned, your messages go to "+R.name+" ("+R.role.toLowerCase()+")."));
+    $("adRole").textContent=R.role+" · covering";
+    if(nm){nm.textContent=R.name;var cv=el("div");cv.appendChild(el("span",{"class":"vacnote"},ad.name?"Covering for "+ad.name:"New Account Director being assigned"));nm.appendChild(cv)}
+    dd.innerHTML="";dd.appendChild(el("span",null,R.name));dd.appendChild(el("br"));var ae=el("a",{href:"mailto:"+R.email,style:"color:var(--sub)"},R.email);dd.appendChild(ae);dd.appendChild(el("div",{"class":"small",style:"margin-top:4px"},"Covering for "+(ad.name||"your Account Director")));
+    var oc=$("ovAdCell");oc.innerHTML="";oc.appendChild(el("div",null,ad.name||"Being assigned"));oc.appendChild(el("div",{"class":"small"},"Inactive · contact "+R.name));
+    $("adRouteNote").textContent="Messages you send here go to "+R.name+" because your Account Director is inactive"+(ad.endDate&&ad.endDate!=="set"?" (end date "+ad.endDate+")":"")+".";
+    $("adUpdated").textContent=when?"Account team updated "+when:"";
+  }else if(ad.name){
+    $("bnText").innerHTML=ORIG_BANNER;$("ovAdCell").innerHTML='<span data-ad="name"></span>';dd.innerHTML='<span data-ad="name"></span><br><a data-ad="email" style="color:var(--sub)"></a>';if(nm)nm.textContent="";
+    $("adRole").textContent=ad.title&&ad.title!=="Account Director"?ad.title+" · Account Director":"Account Director";
+    AD.name=ad.name;AD.initials=ad.initials||ad.name.split(" ").map(function(x){return x[0]}).join("").slice(0,2);AD.email=ad.email;AD.phone=ad.phone||"-";AD.office=ad.office||"-";AD.lang=ad.lang||"English";fillAD();
+    $("adRouteNote").textContent="Messages you send here are emailed to "+ad.name+".";
+    $("adUpdated").textContent=when?"Account Director updated "+when:"";
+  }
+  if(HAS_GAS&&st.messages){requests=st.messages;renderReqs()}
+  NOTIFS=st.notifications||[];var c=$("bellCount");c.hidden=!NOTIFS.length;c.textContent=String(NOTIFS.length);
+  $("bellBtn").setAttribute("aria-label","Notifications ("+NOTIFS.length+")")}
+function loadState(){if(!HAS_GAS)return;google.script.run.withSuccessHandler(function(st){applyState(st)}).withFailureHandler(function(){}).getState()}
+loadState();
+window.addEventListener("focus",loadState);
+setInterval(loadState,30000);
+$("bellBtn").addEventListener("click",function(){var box=$("ntfList");box.innerHTML="";
+  if(!NOTIFS.length){box.appendChild(el("p",{style:"margin:0"},"No notifications yet. They appear here when the Account Director is changed or updated in Dynamics."))}
+  NOTIFS.forEach(function(n){var a=el("article");a.appendChild(el("div",{style:"font-weight:600"},n.subject));
+    a.appendChild(el("div",{"class":"small"},"To "+n.to.name+" <"+n.to.email+"> · "+new Date(n.sentAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · "+n.id+" · "+n.delivered));
+    a.appendChild(el("pre",null,n.body));box.appendChild(a)});
+  $("ntfDlg").showModal()});
+$("nClose").addEventListener("click",function(){$("ntfDlg").close()});
+
+// ===== CSP: billing contact (source of truth for the Dynamics opportunity) =====
+var BC={firstName:"Test",lastName:"Contact",name:"Test Contact",email:"test.contact@example.com",updatedAt:"",updatedBy:""};
+function renderBC(){$("bcName").textContent=BC.name;$("bcEmail").textContent=BC.email;$("bcInv").textContent=BC.email;
+  $("bcUpd").textContent=BC.updatedAt?"Updated "+new Date(BC.updatedAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+(BC.updatedBy?" by "+BC.updatedBy:""):"";
+}
+var _applyState=applyState;
+applyState=function(st){_applyState(st);if(st&&st.billingContact){var b=st.billingContact;BC={firstName:b.firstName||(b.name||"").split(" ")[0],lastName:b.lastName||(b.name||"").split(" ").slice(1).join(" "),name:b.name||((b.firstName||"")+" "+(b.lastName||"")).trim(),email:b.email,updatedAt:b.updatedAt||"",updatedBy:b.updatedBy||""};renderBC()}};
+$("bcEdit").addEventListener("click",function(){$("bFirst").value=BC.firstName;$("bLast").value=BC.lastName;$("bEmail").value=BC.email;$("bErr").hidden=true;$("bcDlg").showModal();$("bFirst").focus()});
+["bClose","bCancel"].forEach(function(i){$(i).addEventListener("click",function(){$("bcDlg").close()})});
+$("bcForm").addEventListener("submit",function(e){e.preventDefault();
+  var f=$("bFirst").value.trim(),l=$("bLast").value.trim(),m=$("bEmail").value.trim(),err=$("bErr");
+  if(!f||!l){err.textContent="First name and last name are required.";err.hidden=false;return}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)){err.textContent="Enter a valid email address.";err.hidden=false;return}
+  var payload={firstName:f,lastName:l,email:m};$("bSave").disabled=true;
+  var done=function(st){$("bSave").disabled=false;$("bcDlg").close();applyState(st);toast("Billing contact saved · Dynamics opportunity updated")};
+  if(HAS_GAS){google.script.run.withSuccessHandler(done).withFailureHandler(function(x){$("bSave").disabled=false;err.textContent=(x&&x.message)||"Couldn't save. Try again.";err.hidden=false}).setBillingContact(payload,"CSP agent (test)")}
+  else{BC={firstName:f,lastName:l,name:f+" "+l,email:m,updatedAt:new Date().toISOString(),updatedBy:"CSP agent (test)"};renderBC();$("bSave").disabled=false;$("bcDlg").close();toast("Billing contact saved (local test - not shared)")}
+});
+</script>
+</body>
+</html>

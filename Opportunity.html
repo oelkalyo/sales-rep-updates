@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opportunity - Dynamics 365 (TEST)</title>
+<style>
+:root{--bg:#f5f5f5;--card:#fff;--fg:#242424;--sub:#424242;--field:#f3f3f3;--border:#e0e0e0;--blue:#0f6cbd;--nav:#0b2341}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--fg);background:var(--bg);font-size:14px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+a{color:var(--blue)}
+.skip{position:absolute;inset-inline-start:-999px}.skip:focus{inset-inline-start:8px;top:8px;background:#fff;padding:6px 10px;z-index:30}
+header.top{height:48px;background:var(--nav);color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px}
+header.top b{font-weight:600;font-size:16px}header.top .sep{width:1px;height:20px;background:rgba(255,255,255,.35)}
+.search{margin-inline-start:auto;margin-inline-end:auto;background:#ffffff26;border-radius:4px;padding:5px 12px;min-width:240px;color:#e5e7eb;font-size:13px}
+.testbadge{background:#fde68a;color:#78350f;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;white-space:nowrap}
+.navlinks{display:flex;gap:12px;font-size:13px}.navlinks a{color:#dbeafe}
+.ro{display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:13px;background:#fff8e1;border-bottom:1px solid #f3d27a}
+.wrap{padding:12px 16px 40px}
+.cmd{display:flex;flex-wrap:wrap;gap:2px;align-items:center;padding:6px 10px;background:#fff;border:1px solid var(--border);border-radius:8px;margin-bottom:10px}
+.cbtn{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;padding:6px 10px;border-radius:4px;cursor:pointer;white-space:nowrap}
+.cbtn:hover{background:#f0f0f0}
+.cbtn .in{display:inline-grid;place-items:center;width:16px;height:16px;background:#242424;color:#fff;border-radius:2px;font-size:10px;font-weight:800}
+.recordhead{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px 20px 0;margin-bottom:12px}
+.rh1{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-start}
+.rh1 h1{font-size:20px;margin:0;font-weight:600}.rh1 .saved{color:var(--sub);font-weight:400;font-size:14px}
+.rh1 .ent{color:var(--sub);font-size:14px;margin-top:4px}
+.kpis{margin-inline-start:auto;display:flex;gap:0;align-items:center}
+.kpis div{padding:0 16px;border-inline-start:1px solid var(--border)}.kpis div:first-child{border:0}
+.kpis b{display:block;font-size:14px}.kpis span{font-size:12px;color:var(--sub)}
+.owner{display:flex;align-items:center;gap:8px}
+.av{width:32px;height:32px;border-radius:50%;background:#c7d2fe;color:#1e1b4b;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0}
+.rtabs{display:flex;gap:2px;margin-top:14px;overflow-x:auto}
+.rtab{border:0;background:none;padding:10px 10px 12px;cursor:pointer;font-size:15px;color:var(--fg);border-bottom:3px solid transparent;white-space:nowrap}
+.rtab[aria-selected=true]{font-weight:600;border-bottom-color:var(--blue)}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+.col{display:grid;gap:12px}
+section.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 18px}
+section.card h2{font-size:15px;margin:0 0 10px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.f{display:grid;grid-template-columns:180px 10px minmax(0,1fr);align-items:center;gap:6px;padding:5px 0}
+.f .l{color:var(--fg)}.f .r{color:#c50f1f;font-weight:700}
+.v{background:var(--field);border-radius:4px;min-height:34px;padding:7px 12px;display:flex;align-items:center;gap:6px;word-break:break-word}
+.v a{color:var(--blue)}
+.v.multi{min-height:56px;align-items:flex-start}
+.stack .lab{font-weight:600;margin:10px 0 6px}
+.stack .v{min-height:34px}
+.subtabs{display:flex;gap:16px;margin-bottom:10px}
+.subtab{border:0;background:none;padding:6px 2px;cursor:pointer;color:var(--fg);border-bottom:3px solid transparent}
+.subtab[aria-selected=true]{border-bottom-color:var(--blue);font-weight:600}
+.center{text-align:center;color:var(--sub);margin:8px 0}
+.sel{border:1px solid #8a8886;border-radius:4px;min-height:34px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;background:#fff;color:#605e5c}
+.bluebtn{display:block;width:100%;background:var(--blue);color:#fff;border:0;border-radius:2px;padding:8px;font-weight:600;cursor:pointer;margin:8px 0}
+.note{background:var(--field);border-radius:4px;padding:12px 14px;line-height:1.7;white-space:pre-wrap}
+.empty{display:grid;place-items:center;padding:16px;color:var(--sub);gap:8px}
+table{width:100%;border-collapse:collapse}th,td{text-align:start;padding:8px 6px;border-bottom:1px solid var(--border);font-size:13px}th{font-weight:600}
+.tl{list-style:none;margin:0;padding:0}.tl li{display:flex;gap:10px;padding:10px 0;font-size:13px;border-top:1px solid #f0f0f0}
+.tl .ic{width:18px;height:18px;border-radius:50%;background:#e5e7eb;flex-shrink:0;margin-top:2px}
+.tl .ic.bc{background:#fde68a}
+.tl .meta{color:var(--sub)}
+.sync{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:1px 8px;font-size:12px;font-weight:600;border:1px solid}
+.sync::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.sync.ok{background:#dcfce7;color:#166534;border-color:#86efac}.sync.chg{background:#fef3c7;color:#78350f;border-color:#f59e0b}.sync.off{background:#f1f5f9;color:#334155;border-color:#cbd5e1}
+.newtag{background:#dbeafe;color:#1e3a8a;border-radius:4px;padding:0 6px;font-size:11px;font-weight:700}
+.hint{font-size:12px;color:var(--sub);margin:6px 0 0}
+.flash{animation:flash 2.5s ease-out}@keyframes flash{0%{background:#fde68a}100%{background:var(--card)}}
+.view[hidden]{display:none}
+.toast{position:fixed;bottom:16px;inset-inline-end:16px;background:#111827;color:#fff;padding:10px 14px;border-radius:6px;opacity:0;transition:opacity .2s;z-index:20;max-width:420px}
+.toast.show{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:1200px){.cols{grid-template-columns:1fr 1fr}.col.c3{grid-column:1/-1}}
+@media (max-width:780px){.cols{grid-template-columns:1fr}.f{grid-template-columns:1fr}.f .r{display:none}.kpis{margin-inline-start:0;flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}}
+@media (forced-colors:active){.sync::before{background:CanvasText}}
+</style>
+</head>
+<body>
+<a class="skip" href="#rec">Skip to record</a>
+<header class="top">
+  <b>Dynamics 365</b><span class="sep" aria-hidden="true"></span><span>Test Support</span>
+  <span class="search" aria-hidden="true">Search</span>
+  <nav class="navlinks" aria-label="Prototype pages"><a href="<?= url ?>?page=account" target="_top">Account</a><a href="<?= url ?>?page=csp" target="_top">CSP</a><a href="<?= url ?>" target="_top">Account Director (Dynamics users)</a><a href="<?= url ?>?page=admin" target="_top">Admin Center</a></nav>
+  <span class="testbadge">TEST DATA</span>
+</header>
+<a id="cspLink" href="<?= url ?>?page=csp" target="_top" hidden>CSP</a><a id="accLink" href="<?= url ?>?page=account" target="_top" hidden>Account</a>
+<div class="ro" role="note"><b>Read-only:</b> test record. The Billing Contact is maintained in CSP.</div>
+
+<div class="wrap">
+  <div class="cmd" role="toolbar" aria-label="Record commands">
+    <button class="cbtn" type="button" data-na="Back"><span aria-hidden="true">←</span><span class="sr">Back</span></button>
+    <button class="cbtn" type="button" data-na="Solution Builder"><span class="in" aria-hidden="true">in</span>Solution Builder</button>
+    <button class="cbtn" type="button" id="cspOrder"><span class="in" aria-hidden="true">in</span>CSP Order</button>
+    <button class="cbtn" type="button" data-na="Contract Receivables Summary">Contract Receivables S...</button>
+    <button class="cbtn" type="button" data-na="Check access">Check access</button>
+    <button class="cbtn" type="button" id="refreshBtn">↻ Refresh</button>
+    <button class="cbtn" type="button" id="followBtn" aria-pressed="false">☆ Follow</button>
+    <button class="cbtn" type="button" data-na="Free Trials"><span class="in" aria-hidden="true">in</span>Free Trials</button>
+    <button class="cbtn" type="button" data-na="More">⋮ More</button>
+    <button class="cbtn" type="button" data-na="Share" style="margin-inline-start:auto">Share</button>
+  </div>
+
+  <main id="rec" tabindex="-1">
+  <div class="recordhead">
+    <div class="rh1">
+      <div><h1>Test Company Ltd-Renewal--RTCD 02/15/2028 <span class="saved">- Saved</span></h1><div class="ent">Opportunity</div></div>
+      <div class="kpis">
+        <div><b>02/15/2028</b><span>Close Date</span></div>
+        <div><b>£10,000.00</b><span>Amount</span></div>
+        <div><b>Closed Won</b><span>Stage</span></div>
+        <div class="owner"><span class="av" aria-hidden="true">TE</span><span><b style="color:var(--blue)" id="ownerName">Test Account Executive</b><span>Owner</span></span></div>
+      </div>
+    </div>
+    <div class="rtabs" role="tablist" aria-label="Opportunity sections" id="rtabs"></div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="view" id="v-Summary">
+  <div class="cols">
+    <div class="col">
+      <section class="card" aria-labelledby="h-oi">
+        <h2 id="h-oi">Opportunity Information</h2>
+        <div id="oiFields"></div>
+      </section>
+      <section class="card" aria-labelledby="h-fc">
+        <h2 id="h-fc">Forecasting</h2>
+        <div id="fcFields"></div>
+      </section>
+      <section class="card" aria-labelledby="h-bd" id="bdCard">
+        <h2 id="h-bd">Billing Details</h2>
+        <div id="bdFields"></div>
+        <div class="f" style="margin-top:6px"><span class="l" style="font-weight:600">Billing Contact</span><span></span><span></span></div>
+        <div class="f"><span class="l" id="l-bf">First Name</span><span></span><div class="v" id="bcFirst" aria-labelledby="l-bf">—</div></div>
+        <div class="f"><span class="l" id="l-bl">Family Name</span><span></span><div class="v" id="bcLast" aria-labelledby="l-bl">—</div></div>
+        <div class="f"><span class="l" id="l-be">Email Address</span><span></span><div class="v" id="bcEmail" aria-labelledby="l-be">—</div></div>
+      </section>
+      <section class="card" aria-labelledby="h-sd">
+        <h2 id="h-sd">Shipping Details</h2>
+        <div id="sdFields"></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card" aria-label="Value Engagement Methodology">
+        <div class="subtabs" role="tablist" aria-label="Methodology"><button class="subtab" role="tab" type="button" aria-selected="true">TAL</button><button class="subtab" role="tab" type="button" aria-selected="false" data-na="LTS">LTS</button></div>
+        <div class="center">Value Engagement Methodology (read only)</div>
+        <div class="stack" id="vem"></div>
+        <p class="center" style="text-align:start">VEM has not been updated by any user</p>
+        <div class="subtabs" style="margin-top:12px"><button class="subtab" type="button" aria-selected="true">HIRING</button></div>
+        <div class="center">Customer Insights</div>
+        <div class="v" style="margin-bottom:8px">Info: Does not have an Enterprise Program</div>
+        <div class="stack" id="ins"></div>
+        <div class="center">Standardized Customer Objectives</div>
+        <button class="bluebtn" type="button" data-na="Add Standardized Customer Objective">Add Standardized Customer Objective</button>
+        <div class="lab" style="font-weight:600">Standardized Customer Objectives Notes</div><div class="sel" style="min-height:34px"></div>
+      </section>
+      <section class="card" aria-labelledby="h-ai">
+        <h2 id="h-ai">Additional Information</h2>
+        <div id="aiFields"></div>
+      </section>
+      <section class="card" aria-labelledby="h-tl">
+        <h2 id="h-tl">Recent Opportunity Activity</h2>
+        <div style="font-weight:600;margin-bottom:6px">Timeline</div>
+        <ul class="tl" id="timeline"></ul>
+      </section>
+    </div>
+
+    <div class="col c3">
+      <section class="card" aria-labelledby="h-ns"><h2 id="h-ns">Next Steps</h2><div class="v multi">Account Director is managed on the account team (account level); confirm billing contact (test).</div></section>
+      <section class="card" aria-labelledby="h-cr">
+        <h2 id="h-cr">Opportunity Contact Roles</h2>
+        <table><thead><tr><th>Contact</th><th>Role</th><th>Status</th></tr></thead><tbody id="roles"></tbody></table>
+        <div class="hint" id="rolesCount"></div>
+      </section>
+      <section class="card" aria-labelledby="h-ci">
+        <h2 id="h-ci">Contract Information (Solution Builder)</h2>
+        <div id="ciFields"></div>
+      </section>
+      <section class="card" aria-labelledby="h-or">
+        <h2 id="h-or">Opportunity Relationships</h2>
+        <div id="orFields"></div>
+      </section>
+      <section class="card" aria-labelledby="h-dd">
+        <h2 id="h-dd">Deal Desk Notes</h2>
+        <div class="note">CSL and FLD:  TEST-CSL-0001 / TEST-CONTRACT-0001
+
+Termination Date:  —
+
+Product and Qty being cancelled:  — (test)
+
+Product Line Number:  1
+
+Debook Amount:  0.00
+
+Case ID:  <span id="ddCase">—</span></div>
+        <div id="ddFields" style="margin-top:8px"></div>
+      </section>
+    </div>
+  </div>
+  </div>
+
+  <!-- PRODUCTS & ORDER -->
+  <div class="view" id="v-Products & Order" hidden>
+    <section class="card"><h2>Products &amp; Order</h2>
+      <table><thead><tr><th>Product</th><th>Quantity</th><th>Price per unit</th><th>Extended amount</th></tr></thead>
+      <tbody><tr><td>Recruiter Corporate (test)</td><td>5</td><td>£1,600.00</td><td>£8,000.00</td></tr><tr><td>Job Slot (test)</td><td>3</td><td>£666.67</td><td>£2,000.00</td></tr></tbody>
+      <tfoot><tr><th colspan="3">Total</th><th>£10,000.00</th></tr></tfoot></table>
+    </section>
+  </div>
+  <!-- CASES -->
+  <div class="view" id="v-Cases" hidden>
+    <section class="card"><h2>Cases</h2><table><thead><tr><th>Case</th><th>Title</th><th>Queue</th><th>Status</th></tr></thead><tbody id="casesBody"></tbody></table></section>
+  </div>
+  <!-- generic -->
+  <div class="view" id="v-other" hidden><section class="card"><h2 id="otherTitle"></h2><div class="empty"><span aria-hidden="true" style="font-size:40px">▦</span>We didn't find anything to show here (test prototype)</div></section></div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ===== ALL VALUES BELOW ARE FAKE TEST DATA =====
+var $=function(i){return document.getElementById(i)};
+function el(t,a,x){var e=document.createElement(t);if(a)for(var k in a)e.setAttribute(k,a[k]);if(x!=null)e.textContent=x;return e}
+function toast(m){var t=$("toast");t.textContent=m;t.className="toast show";clearTimeout(toast.t);toast.t=setTimeout(function(){t.className="toast"},3200)}
+function fields(target,rows){var box=$(target);box.innerHTML="";rows.forEach(function(r){var id="l-"+target+"-"+r[0].replace(/\W+/g,"");
+  var f=el("div",{"class":"f"});f.appendChild(el("span",{"class":"l",id:id},r[0]));f.appendChild(el("span",{"class":"r","aria-hidden":"true"},r[2]?"*":""));
+  var v=el("div",{"class":"v"+(r[4]?" multi":""),"aria-labelledby":id});
+  if(r[3]&&r[0]==="Account Name"){var a0=el("a",{href:$("accLink").href,target:"_top"},r[1]);v.appendChild(a0)}
+  else if(r[3]){var a=el("a",{href:"#"},r[1]);a.addEventListener("click",function(e){e.preventDefault();toast("Linked record isn't available in this prototype.")});v.appendChild(a)}else v.textContent=r[1];
+  f.appendChild(v);box.appendChild(f)})}
+// [label, value, required, isLink]
+fields("oiFields",[["Opportunity Owner","Test Account Executive",1,1],["Opportunity Co-sell Owner",""],["Account Name","Test Company Ltd",1,1],
+ ["Opportunity Name","Test Company Ltd-Renewal--RTCD 02/15/2028",1],["Opportunity Type","Renewal",1],["Product Line (Primary)","Hiring",0,1],
+ ["Sales Approach (Primary)","Renewal or Upsell"],["Renewal Target Close Date","02/15/2028"],["Close Date","02/15/2028",1],["First Year Amount","£10,000.00"],
+ ["Amount","£10,000.00"],["Quote/Order Term (Months)","24"],["Currency","Pound Sterling",1,1],["Sales Channel","Direct",1],["Channel Shift",""],
+ ["Referral Partner",""],["Dynamics ID","urn:test:opportunity:TEST-OPP-0001"]]);
+fields("fcFields",[["Stage","Closed Won",1],["Opportunity Type","Renewal",1],["Commitment Level","Not Applicable"],["Probability (%)","100",1],["Outlook","£10,000.00"],["Expected Outlook Amount","£10,000.00"]]);
+fields("bdFields",[["Quote/Order Bill To Account","Test Company Ltd",1,1],["Quote/Order Bill To Address","1 Test Street Testville TE1 1ST",0,1]]);
+fields("sdFields",[["Quote/Order Ship To Account","Test Company Ltd",1,1],["Quote/Order Ship To Address","1 Test Street Testville TE1 1ST",0,1]]);
+fields("aiFields",[["Opening Rep Handoff Notes",""],["Closing Rep Handoff Notes",""],["Sales Qualification Meeting Date",""],["Reasons for Customer Interest","---"],["Reason Lost/Downgraded Category",""],["Reason Lost/Downgraded",""],["Reason Lost/Downgraded Notes","",0,0,1]]);
+fields("ciFields",[["Quoting Status","Order Signed"],["Order Number","TEST-CONTRACT-0001"],["Order Sign Date","02/20/2026"],["Quote/Order Start Date","03/01/2026"],["Quote/Order End Date","02/29/2028"],["Order Billing System","Test Billing System"]]);
+fields("orFields",[["Created From Opportunity","TEST-OPP-0000",0,1],["Renewed by Opportunity","Test Company Ltd-Renewal--RTCD 02/15/2030",0,1],["Originating Lead",""]]);
+fields("ddFields",[["Is Acquisition","No"],["Temporary Coverage Opportunity","No"],["Is Co-Sell Owner Temporary Coverage","No"]]);
+// VEM + insights (empty, like the source form)
+["Customer Pressures","Customer Objectives","Customer Challenges","LinkedIn's Solutions","LinkedIn's Experience","LinkedIn's Value"].forEach(function(l){var s=$("vem");s.appendChild(el("div",{"class":"lab"},l));s.appendChild(el("div",{"class":"v"},""))});
+[["Customer Engagement Notes","text"],["Competitors","sel"],["Reasons for Considering Competitors","sel"],["Customer Sentiment","sel1"],["Customer Sentiment Notes","text"],["Talent CRM","sel1"],["ATS","sel1"]].forEach(function(r){var s=$("ins");s.appendChild(el("div",{"class":"lab"},r[0]));
+  var d=el("div",{"class":"sel"});if(r[1]!=="text"){d.appendChild(el("span",null,r[1]==="sel"?"Select options":"Select option"));d.appendChild(el("span",{"aria-hidden":"true"},"⌄"))}s.appendChild(d)});
+// tabs
+var TABS=["Summary","Opportunity Relationships","Products & Order","Cases","Forecast","Deal Credits","Commissionables","Sales Development","Attachments","Sales Navigator","Commercial Milestone","Related"];
+TABS.forEach(function(t,i){var b=el("button",{"class":"rtab",role:"tab",type:"button","aria-selected":String(i===0)},t);b.addEventListener("click",function(){
+  [].slice.call($("rtabs").children).forEach(function(x){x.setAttribute("aria-selected",String(x===b))});
+  [].slice.call(document.querySelectorAll(".view")).forEach(function(v){v.hidden=true});
+  var v=document.getElementById("v-"+t);if(v)v.hidden=false;else{$("otherTitle").textContent=t;$("v-other").hidden=false}});$("rtabs").appendChild(b)});
+// commands
+[].slice.call(document.querySelectorAll("[data-na]")).forEach(function(b){b.addEventListener("click",function(){toast(b.getAttribute("data-na")+" isn't available in this test prototype.")})});
+$("cspOrder").addEventListener("click",function(){window.open($("cspLink")?$("cspLink").href:"?page=admin","_top")});
+$("followBtn").addEventListener("click",function(){var on=this.getAttribute("aria-pressed")!=="true";this.setAttribute("aria-pressed",String(on));this.textContent=(on?"★ Following":"☆ Follow")});
+
+// timeline base (fake)
+var BASE_TL=[["2026-02-20T08:15:00Z","Auto-post: Test Integration changed Probability from 0% to 100%"],["2026-01-27T15:00:00Z","Auto-post: Test Account Executive changed Probability from 99% to 0%"],["2025-12-23T17:33:00Z","Auto-post: Opportunity created by Test Integration for Account Test Company Ltd"]];
+function fmtDT(x){return new Date(x).toLocaleString("en-US",{month:"numeric",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"})}
+function renderTimeline(hist){var ul=$("timeline");ul.innerHTML="";
+  var items=(hist||[]).map(function(h){return [h.at,"Billing contact changed in CSP by "+h.by+": "+h.from+" → "+h.to,1]}).concat(BASE_TL);
+  items.sort(function(a,b){return a[0]<b[0]?1:-1});
+  items.slice(0,6).forEach(function(it){var li=el("li");li.appendChild(el("span",{"class":"ic"+(it[2]?" bc":""),"aria-hidden":"true"}));var d=el("div");d.appendChild(el("div",null,it[1]));d.appendChild(el("div",{"class":"meta"},fmtDT(it[0])));li.appendChild(d);ul.appendChild(li)})}
+
+// ===== Billing contact sync from CSP =====
+var HAS_GAS=(typeof google!=="undefined"&&google.script&&google.script.run);
+var lastBC=null;
+function split(b){return {first:b.firstName||(b.name||"").split(" ")[0]||"",last:b.lastName||(b.name||"").split(" ").slice(1).join(" ")}}
+function applyState(st,manual,offline){if(!st||!st.billingContact)return;var b=st.billingContact,n=split(b);
+  var key=n.first+"|"+n.last+"|"+b.email,changed=lastBC!==null&&lastBC!==key;lastBC=key;
+  $("bcFirst").textContent=n.first;$("bcLast").textContent=n.last;$("bcEmail").textContent=b.email;
+  var A=st.ad||{},adOn=!!(A.name&&!A.vacant&&!A.endDate&&A.active!==false),R=st.route||{};
+  var ad=A.name?A.name:"Being assigned";
+  var tb=$("roles");tb.innerHTML="";[[n.first+" "+n.last+" ("+b.email+")","Billing Contact","Active (from CSP)"],["Test Contact (test.contact@example.com)","Primary Contact","Active"],[ad,"Account Director",!A.name?"Being assigned":adOn?"Active":"Inactive · messages go to "+(R.name||A.managerName||"manager")]].forEach(function(r){var tr=el("tr");r.forEach(function(x){tr.appendChild(el("td",null,x))});tb.appendChild(tr)});
+  $("rolesCount").textContent="Rows: 3";
+  renderTimeline(st.billingHistory);
+  var cs=st.tickets||[];var cb=$("casesBody");cb.innerHTML="";if(!cs.length){var r=el("tr");r.appendChild(el("td",{colspan:"4"},"No cases"));cb.appendChild(r)}
+  cs.forEach(function(c){var r=el("tr");[c.id,c.title,c.queue,c.status].forEach(function(x){r.appendChild(el("td",null,x))});cb.appendChild(r)});
+  $("ddCase").textContent=cs.length?cs[0].id:"—";
+  if(changed){var c=$("bdCard");c.classList.remove("flash");void c.offsetWidth;c.classList.add("flash");toast("Billing contact updated from CSP: "+n.first+" "+n.last)}
+  else if(manual)toast("Billing contact is up to date with CSP");
+}
+function load(manual){
+  if(!HAS_GAS){applyState({contractId:"TEST-CONTRACT-0001",billingContact:{firstName:"Test",lastName:"Contact",email:"test.contact@example.com"},ad:{name:"Test Account Director"},billingHistory:[],tickets:[]},manual,true);return}
+  google.script.run.withSuccessHandler(function(st){applyState(st,manual)}).withFailureHandler(function(){if(manual)toast("Couldn't reach CSP. Showing the last known billing contact.")}).getState();
+}
+$("refreshBtn").addEventListener("click",function(){load(true)});
+load(false);
+window.addEventListener("focus",function(){load(false)});
+setInterval(function(){if(!document.hidden)load(false)},15000);
+</script>
+</body>
+</html>
