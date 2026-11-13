@@ -19,7 +19,7 @@ function doGet(e) {
     var ac = HtmlService.createTemplateFromFile('Account');
     ac.url = ScriptApp.getService().getUrl();
     return ac.evaluate()
-      .setTitle('Account - Dynamics 365 (TEST)')
+      .setTitle('Account Level - Dynamics 365 (TEST)')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
   if (page === 'admin') {
@@ -33,7 +33,7 @@ function doGet(e) {
   ix.url = ScriptApp.getService().getUrl();
   ix.userId = String((e && e.parameter && e.parameter.user) || '').replace(/[^\w-]/g, '');
   return ix.evaluate()
-    .setTitle('Dynamics User Accounts (TEST)')
+    .setTitle('Sales Representative - Dynamics 365 (TEST)')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
