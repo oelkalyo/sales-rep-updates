@@ -31,6 +31,7 @@ function doGet(e) {
   }
   var ix = HtmlService.createTemplateFromFile('Index');
   ix.url = ScriptApp.getService().getUrl();
+  ix.userId = String((e && e.parameter && e.parameter.user) || '').replace(/[^\w-]/g, '');
   return ix.evaluate()
     .setTitle('Dynamics User Accounts (TEST)')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
@@ -83,7 +84,7 @@ function route_(ad) {
 
 // Other account team members shown next to the Account Director.
 var DEFAULT_TEAM = [
-  { role: 'Account Executive', name: 'Test Account Executive', email: 'test.accountexecutive@example.com', active: true, endDate: '', managerName: '', managerEmail: '' }
+  { userId: 'u-012', role: 'Account Executive', name: 'Test Account Executive', email: 'test.accountexecutive@example.com', active: true, endDate: '', managerName: 'Test Manager 1', managerEmail: 'test.manager1@example.com' }
 ];
 
 function getState() {
@@ -266,10 +267,26 @@ function setBillingContact(bc, by) {
 
 function resetTestState() {
   var p = props_();
-  ['AD', 'NOTIFS', 'TICKETS', 'BILLING', 'BILLING_HIST', 'MESSAGES'].forEach(function (k) { p.deleteProperty(k); });
+  ['AD', 'TEAM', 'NOTIFS', 'TICKETS', 'BILLING', 'BILLING_HIST', 'MESSAGES'].forEach(function (k) { p.deleteProperty(k); });
   return getState();
 }
 
+
+// The user record (Index page) decides if a team member is active: called when a user is saved.
+function updateTeamMember(u) {
+  if (!u || !u.userId) return getState();
+  return withLock_(function () {
+    var team = read_('TEAM', DEFAULT_TEAM);
+    team.forEach(function (m) {
+      if (m.userId !== u.userId) return;
+      m.name = String(u.name || m.name).slice(0, 120); m.email = String(u.email || m.email).slice(0, 200);
+      m.active = !u.endDate && u.active !== false; m.endDate = String(u.endDate || '');
+      m.managerName = String(u.managerName || ''); m.managerEmail = String(u.managerEmail || '');
+    });
+    write_('TEAM', team);
+    return getState();
+  });
+}
 
 // ===== Dynamics 365 sync (Dataverse Web API) =====
 // Turned off until set in Project Settings > Script properties:

@@ -180,12 +180,14 @@ function routeOf(ad){if(adActive(ad))return {diverted:false,name:ad.name,email:a
   return {diverted:true,name:"Billing Support",email:"billing-support@example.com",role:"Billing Support",reason:why+"; no manager on record"}}
 
 function render(st){if(!st)return;var ad=st.ad||{},on=adActive(ad),r=st.route||routeOf(ad);
-  var tb=$("teamBody");tb.innerHTML="";var tr=el("tr");tr.appendChild(el("td",null,"Account Director"));
-  var who=el("td");if(ad.name){who.appendChild(el("div",{style:"font-weight:600"},ad.name));who.appendChild(el("div",{"class":"hint",style:"margin:0"},ad.email+(ad.phone?" · "+ad.phone:"")))}else who.textContent="Not assigned";tr.appendChild(who);
-  var s=el("td");s.appendChild(el("span",{"class":"pill "+(on?"on":"off")},on?"Active":"Inactive"));tr.appendChild(s);
-  tr.appendChild(el("td",null,fmtD(ad.endDate)));
-  var m=el("td");m.appendChild(el("div",null,ad.managerName||"—"));if(ad.managerEmail)m.appendChild(el("div",{"class":"hint",style:"margin:0"},ad.managerEmail));tr.appendChild(m);tb.appendChild(tr);
-  var tr2=el("tr");["Account Executive","Test Account Executive"].forEach(function(x){tr2.appendChild(el("td",null,x))});var s2=el("td");s2.appendChild(el("span",{"class":"pill on"},"Active"));tr2.appendChild(s2);tr2.appendChild(el("td",null,"—"));tr2.appendChild(el("td",null,"—"));tb.appendChild(tr2);
+  var tb=$("teamBody");tb.innerHTML="";
+  function row(role,uid,name,email,phone,isOn,end,mn,me){var tr=el("tr");tr.appendChild(el("td",null,role));
+    var who=el("td");if(name){var a=el("a",{href:"<?= url ?>?user="+encodeURIComponent(uid||""),target:"_top",style:"font-weight:600"},name);who.appendChild(a);who.appendChild(el("div",{"class":"hint",style:"margin:0"},(email||"")+(phone?" · "+phone:"")))}else who.textContent="Not assigned";tr.appendChild(who);
+    var s=el("td");s.appendChild(el("span",{"class":"pill "+(isOn?"on":"off")},isOn?"Active":"Inactive"));tr.appendChild(s);
+    tr.appendChild(el("td",null,fmtD(end)));
+    var m=el("td");m.appendChild(el("div",null,mn||"—"));if(me)m.appendChild(el("div",{"class":"hint",style:"margin:0"},me));tr.appendChild(m);tb.appendChild(tr)}
+  row("Account Director",ad.userId,ad.name,ad.email,ad.phone,on,ad.endDate,ad.managerName,ad.managerEmail);
+  (st.team||[]).forEach(function(t){row(t.role||"Team member",t.userId,t.name,t.email,t.phone,t.active!==false&&!t.endDate,t.endDate,t.managerName,t.managerEmail)});
   var rb=$("routeBox");rb.innerHTML="";rb.appendChild(el("span",null,"Admin Center messages go to:"));rb.appendChild(el("b",null,r.name+" · "+r.email));
   rb.appendChild(el("span",{"class":"pill "+(r.diverted?"div":"dir")},r.diverted?"Diverted to "+r.role.toLowerCase():"Direct to Account Director"));
   if(r.diverted&&r.reason)rb.appendChild(el("span",{"class":"hint",style:"margin:0;flex-basis:100%"},"Reason: "+r.reason+"."));
@@ -202,7 +204,7 @@ function render(st){if(!st)return;var ad=st.ad||{},on=adActive(ad),r=st.route||r
   cs.forEach(function(c){var rr=el("tr");[c.id,c.title,c.status].forEach(function(v){rr.appendChild(el("td",null,v))});cb.appendChild(rr)});
 }
 var HAS_GAS=(typeof google!=="undefined"&&google.script&&google.script.run);
-var LOCAL={ad:{name:"Test Account Director",email:"test.accountdirector@example.com",phone:"+44 0000 000000",active:true,endDate:"",managerName:"Test Manager 1",managerEmail:"test.manager1@example.com"},messages:[],tickets:[]};
+var LOCAL={ad:{userId:"u-011",name:"Test Account Director",email:"test.accountdirector@example.com",phone:"+44 0000 000000",active:true,endDate:"",managerName:"Test Manager 1",managerEmail:"test.manager1@example.com"},team:[{userId:"u-012",role:"Account Executive",name:"Test Account Executive",email:"test.accountexecutive@example.com",active:true,endDate:"",managerName:"Test Manager 1",managerEmail:"test.manager1@example.com"}],messages:[],tickets:[]};
 function load(manual){if(!HAS_GAS){render(LOCAL);if(manual)toast("Local test copy: open the web app to see live data.");return}
   google.script.run.withSuccessHandler(function(st){render(st);if(manual)toast("Account team refreshed")}).withFailureHandler(function(){if(manual)toast("Couldn't refresh. Try again.")}).getState()}
 $("refreshBtn").addEventListener("click",function(){load(true)});
