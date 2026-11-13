@@ -145,7 +145,7 @@ label.f{display:grid;gap:6px;font-weight:600;font-size:14px}
     <button type="button" data-view="overview">Overview</button>
     <button type="button" data-view="contract" aria-current="page">Contracts &amp; orders</button>
     <button type="button" data-view="transactions">Transactions</button>
-    <div class="back"><a href="<?= url ?>?page=csp" target="_top">← CSP</a><br><a href="<?= url ?>?page=opportunity" target="_top">← Dynamics opportunity</a><br><a href="<?= url ?>" target="_top">← Account Director (Dynamics users)</a></div>
+    <div class="back"><a href="CSP.html" target="_top">← CSP</a><br><a href="Opportunity.html" target="_top">← Dynamics opportunity</a><br><a href="#adCard" id="openSalesRepInfo">← Contact your Sales Representative</a></div>
   </nav>
 
   <main id="content" tabindex="-1">
@@ -398,7 +398,30 @@ label.f{display:grid;gap:6px;font-weight:600;font-size:14px}
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<dialog id="adCard" aria-labelledby="adCardTitle" style="border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--fg);padding:24px;max-width:380px">
+  <h2 id="adCardTitle" style="margin:0 0 12px;font-size:18px">Your Sales Representative</h2>
+  <p style="margin:4px 0"><b id="adCardName"></b></p>
+  <p style="margin:4px 0">Email: <a id="adCardEmail"></a></p>
+  <p style="margin:4px 0">Phone: <span id="adCardPhone"></span></p>
+  <p style="margin:4px 0;color:var(--sub)" id="adCardOffice"></p>
+  <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+    <a class="btn primary" id="adCardMail" style="text-decoration:none">Send email</a>
+    <a class="btn" id="adCardCall" style="text-decoration:none">Call</a>
+    <form method="dialog" style="margin:0"><button class="btn" autofocus>Close</button></form>
+  </div>
+</dialog>
+
 <script>
+document.getElementById("openSalesRepInfo").addEventListener("click",function(e){
+  e.preventDefault();
+  document.getElementById("adCardName").textContent=AD.name;
+  var m=document.getElementById("adCardEmail");m.textContent=AD.email;m.href="mailto:"+AD.email;
+  document.getElementById("adCardPhone").textContent=AD.phone;
+  document.getElementById("adCardMail").href="mailto:"+AD.email+"?subject="+encodeURIComponent("Question about contract "+CONTRACT_ID);
+  document.getElementById("adCardCall").href="tel:"+AD.phone.replace(/[^+\d]/g,"");
+  document.getElementById("adCardOffice").textContent=AD.office;
+  document.getElementById("adCard").showModal();
+});
 // ---------- data (edit here) ----------
 var AD={name:"Test Account Director",initials:"TA",email:"test.accountdirector@example.com",phone:"+44 0000 000000",office:"Test Office, UK (GMT)",lang:"English",hoursUK:[9,18]};
 var CONTRACT_ID="TEST-CONTRACT-0001";
