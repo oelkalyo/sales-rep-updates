@@ -179,10 +179,12 @@ function routeOf(ad){if(adActive(ad))return {diverted:false,name:ad.name,email:a
   if(ad&&ad.managerEmail)return {diverted:true,name:ad.managerName||"Manager",email:ad.managerEmail,role:"Manager of the Account Director",reason:why};
   return {diverted:true,name:"Billing Support",email:"billing-support@example.com",role:"Billing Support",reason:why+"; no manager on record"}}
 
+var APP_URL="<?= url ?>";
+function userLink(uid){var q="?user="+encodeURIComponent(uid||"");return APP_URL.indexOf("http")===0?APP_URL+q:"Index.html"+q}
 function render(st){if(!st)return;var ad=st.ad||{},on=adActive(ad),r=st.route||routeOf(ad);
   var tb=$("teamBody");tb.innerHTML="";
   function row(role,uid,name,email,phone,isOn,end,mn,me){var tr=el("tr");tr.appendChild(el("td",null,role));
-    var who=el("td");if(name){var a=el("a",{href:"<?= url ?>?user="+encodeURIComponent(uid||""),target:"_top",style:"font-weight:600"},name);who.appendChild(a);who.appendChild(el("div",{"class":"hint",style:"margin:0"},(email||"")+(phone?" · "+phone:"")))}else who.textContent="Not assigned";tr.appendChild(who);
+    var who=el("td");if(name){var a=el("a",{href:userLink(uid),target:"_top",style:"font-weight:600"},name);who.appendChild(a);who.appendChild(el("div",{"class":"hint",style:"margin:0"},(email||"")+(phone?" · "+phone:"")))}else who.textContent="Not assigned";tr.appendChild(who);
     var s=el("td");s.appendChild(el("span",{"class":"pill "+(isOn?"on":"off")},isOn?"Active":"Inactive"));tr.appendChild(s);
     tr.appendChild(el("td",null,fmtD(end)));
     var m=el("td");m.appendChild(el("div",null,mn||"—"));if(me)m.appendChild(el("div",{"class":"hint",style:"margin:0"},me));tr.appendChild(m);tb.appendChild(tr)}

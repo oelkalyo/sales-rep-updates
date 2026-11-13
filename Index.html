@@ -203,6 +203,7 @@ function badge(s){return el("span",{"class":"badge "+s},s)}
 
 SAMPLE_USERS.forEach(function(u){if(u.endDate)u.activeStatus="Inactive"});
 var START_USER="<?= userId ?>";
+if(START_USER.indexOf("<")===0){var qm=/[?&]user=([\w-]+)/.exec(location.search);START_USER=qm?qm[1]:""}
 var startRec=SAMPLE_USERS.filter(function(x){return x.id===START_USER})[0]||SAMPLE_USERS[0];
 var users=clone(SAMPLE_USERS), selectedId=startRec.id, draft=clone(startRec), isNew=false, activeTab="summary";
 var $=function(id){return document.getElementById(id)};
