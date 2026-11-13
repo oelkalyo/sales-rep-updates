@@ -119,6 +119,8 @@ pre.mail{white-space:pre-wrap;background:#f8fafc;border:1px solid var(--border);
       <button class="btn ghost" id="rolesBtn" type="button">Manage Roles</button>
       <button class="btn ghost" id="casesBtn" type="button">Billing Support cases</button>
       <span class="dirty" id="dirty" hidden>Unsaved changes</span>
+      <a class="btn ghost" id="backAcct" hidden style="text-decoration:none">← Back to Account</a>
+      <button class="btn ghost" id="allUsers" type="button" hidden>All users</button>
     </div>
     <div class="head">
       <div style="display:flex;gap:12px;align-items:center"><div class="av lg" id="hAv"></div><div><h1 id="hName"></h1><p>User</p></div></div>
@@ -438,6 +440,12 @@ function openAdDlg(){var ad=adFromUser(draft);$("adWho").textContent=fullName(dr
 $("adNo").addEventListener("click",function(){$("adDlg").close()});
 $("adYes").addEventListener("click",function(){$("adDlg").close();pushAD(draft,"assigned")});
 renderAll();
+if(START_USER&&startRec.id===START_USER){
+  var lst=$("user-list");lst.style.display="none";
+  var back=$("backAcct");back.href=(URL_BASE.indexOf("http")===0?URL_BASE+"?page=account":"Account.html");back.target="_top";back.hidden=false;
+  var all=$("allUsers");all.hidden=false;
+  all.addEventListener("click",function(){var hid=lst.style.display==="none";lst.style.display=hid?"":"none";all.textContent=hid?"Hide list":"All users"});
+}
 updCasesBtn();
 api("getState",[],function(st){adState=st;renderForm();updCasesBtn()},function(){});
 </script>
