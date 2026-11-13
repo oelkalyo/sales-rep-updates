@@ -5,34 +5,34 @@ function doGet(e) {
     var c = HtmlService.createTemplateFromFile('CSP');
     c.url = ScriptApp.getService().getUrl();
     return c.evaluate()
-      .setTitle('Customer Support - CSP')
+      .setTitle('CSP - Customer Support (TEST)')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
   if (page === 'opportunity') {
     var o = HtmlService.createTemplateFromFile('Opportunity');
     o.url = ScriptApp.getService().getUrl();
     return o.evaluate()
-      .setTitle('Opportunity - Dynamics 365')
+      .setTitle('Opportunity - Dynamics 365 (TEST)')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
   if (page === 'account') {
     var ac = HtmlService.createTemplateFromFile('Account');
     ac.url = ScriptApp.getService().getUrl();
     return ac.evaluate()
-      .setTitle('Account - Dynamics 365')
+      .setTitle('Account - Dynamics 365 (TEST)')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
   if (page === 'admin') {
     var t = HtmlService.createTemplateFromFile('AdminCenter');
     t.url = ScriptApp.getService().getUrl();
     return t.evaluate()
-      .setTitle('Admin Center')
+      .setTitle('Admin Center - LinkedIn (TEST)')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
   var ix = HtmlService.createTemplateFromFile('Index');
   ix.url = ScriptApp.getService().getUrl();
   return ix.evaluate()
-    .setTitle('Dynamics User Accounts')
+    .setTitle('Dynamics User Accounts (TEST)')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
