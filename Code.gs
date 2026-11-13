@@ -69,22 +69,29 @@ function withLock_(fn) { var l = LockService.getScriptLock(); l.waitLock(10000);
 function billing_() { BILLING_CONTACT = read_('BILLING', DEFAULT_BILLING_CONTACT); return BILLING_CONTACT; }
 
 // Active/inactive is decided by the End Date on the Account Director's user record.
-function adActive_(ad) { return !!(ad && !ad.vacant && ad.name && !ad.endDate && ad.active !== false); }
+function validEmail_(e) { return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(e || '').trim()); }
+function adActive_(ad) { return !!(ad && !ad.vacant && ad.name && !ad.endDate && ad.active !== false && validEmail_(ad.email)); }
 
 // Who receives a message the customer sends from the Admin Center.
 function route_(ad) {
   if (adActive_(ad)) return { diverted: false, name: ad.name, email: ad.email, role: 'Account Director', reason: '' };
-  var why = (ad && ad.name ? ad.name : 'The Account Director') + ' is inactive' + (ad && ad.endDate ? ' (end date ' + ad.endDate + ')' : '');
-  if (ad && ad.managerEmail) return { diverted: true, name: ad.managerName || 'Manager', email: ad.managerEmail,
+  var why = (ad && ad.name ? ad.name : 'The Account Director') + ' is inactive' + (ad && ad.endDate ? ' (end date ' + ad.endDate + ')' : (ad && ad.name && !validEmail_(ad.email) ? ' (no valid email address)' : ''));
+  if (ad && validEmail_(ad.managerEmail)) return { diverted: true, name: ad.managerName || 'Manager', email: ad.managerEmail,
     role: 'Manager of the Account Director', reason: why, title: ad.managerTitle || '' };
   return { diverted: true, name: BILLING_SUPPORT.name, email: BILLING_SUPPORT.email, role: 'Billing Support', reason: why + '; no manager on record' };
 }
+
+// Other account team members shown next to the Account Director.
+var DEFAULT_TEAM = [
+  { role: 'Account Executive', name: 'Test Account Executive', email: 'test.accountexecutive@example.com', active: true, endDate: '', managerName: '', managerEmail: '' }
+];
 
 function getState() {
   billing_();
   var ad = read_('AD', DEFAULT_AD);
   ad.active = adActive_(ad);
   return {
+    team: read_('TEAM', DEFAULT_TEAM),
     contractId: CONTRACT_ID, company: COMPANY, account: ACCOUNT, route: route_(ad),
     messages: read_('MESSAGES', []),
     billingContact: BILLING_CONTACT, billingSupport: BILLING_SUPPORT,
@@ -211,8 +218,18 @@ function sendCustomerMessage(msg) {
       text + '\n\n(TEST MESSAGE - fake data)';
     var sent = false;
     if (SEND_REAL_EMAIL && !/@example\.com$/i.test(r.email)) {
-      MailApp.sendEmail({ to: r.email, subject: mailSubject, body: body, replyTo: from.email });
-      sent = true;
+      try {
+        MailApp.sendEmail({ to: r.email, subject: mailSubject, body: body, replyTo: from.email });
+        sent = true;
+      } catch (err) {
+        // The Account Director's mailbox rejected the email: divert to the manager.
+        if (r.diverted || !validEmail_(ad.managerEmail)) throw err;
+        r = { diverted: true, name: ad.managerName || 'Manager', email: ad.managerEmail, role: 'Manager of the Account Director',
+              reason: ad.name + "'s email address could not be reached" };
+        body = 'DIVERTED TO YOU AS MANAGER: ' + r.reason + '.\n\n' + body;
+        MailApp.sendEmail({ to: r.email, subject: mailSubject, body: body, replyTo: from.email });
+        sent = true;
+      }
     }
     var list = read_('MESSAGES', []);
     var m = { id: 'REQ-' + (10481 + list.length), at: new Date().toISOString(), from: { name: from.name, email: from.email },
@@ -251,4 +268,41 @@ function resetTestState() {
   var p = props_();
   ['AD', 'NOTIFS', 'TICKETS', 'BILLING', 'BILLING_HIST', 'MESSAGES'].forEach(function (k) { p.deleteProperty(k); });
   return getState();
+}
+
+
+// ===== Dynamics 365 sync (Dataverse Web API) =====
+// Turned off until set in Project Settings > Script properties:
+//   DYN_URL    e.g. https://yourorg.crm.dynamics.com
+//   DYN_TOKEN  a valid OAuth bearer token (or replace token_() with your own auth)
+//   DYN_ACCOUNT_ID  the Dynamics account GUID
+// Reads the account team, finds the Account Director, checks the user's End Date and
+// Active status, and stores the director, their manager and the rest of the team.
+function dynConfigured_() { var p = props_(); return !!(p.getProperty('DYN_URL') && p.getProperty('DYN_TOKEN') && p.getProperty('DYN_ACCOUNT_ID')); }
+function dyn_(path) {
+  var p = props_();
+  var r = UrlFetchApp.fetch(p.getProperty('DYN_URL') + '/api/data/v9.2/' + path, {
+    headers: { Authorization: 'Bearer ' + p.getProperty('DYN_TOKEN'), Accept: 'application/json' }, muteHttpExceptions: true });
+  if (r.getResponseCode() !== 200) throw new Error('Dynamics error ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 200));
+  return JSON.parse(r.getContentText());
+}
+function syncFromDynamics() {
+  if (!dynConfigured_()) return { synced: false, reason: 'Dynamics is not configured yet.' };
+  var acc = props_().getProperty('DYN_ACCOUNT_ID');
+  var members = dyn_("teammembers?$filter=_objectid_value eq " + acc).value || [];
+  var team = [], ad = null;
+  members.forEach(function (m) {
+    var u = dyn_('systemusers(' + m._systemuserid_value + ')?$select=fullname,internalemailaddress,isdisabled,title,mobilephone,_parentsystemuserid_value');
+    var mgr = u._parentsystemuserid_value ? dyn_('systemusers(' + u._parentsystemuserid_value + ')?$select=fullname,internalemailaddress,title') : null;
+    var endDate = u.isdisabled ? 'set' : '';
+    var rec = { userId: m._systemuserid_value, name: u.fullname, title: u.title || '', email: u.internalemailaddress || '', phone: u.mobilephone || '',
+      role: m._roleid_value || m.roleName || '', active: !u.isdisabled, endDate: endDate,
+      managerName: mgr ? mgr.fullname : '', managerEmail: mgr ? (mgr.internalemailaddress || '') : '', managerTitle: mgr ? (mgr.title || '') : '' };
+    if (/account director/i.test(String(m.roleName || m.role || ''))) ad = rec; else team.push(rec);
+  });
+  return withLock_(function () {
+    if (ad) { ad.initials = ad.name.split(' ').map(function (x) { return x[0]; }).join('').slice(0, 3); ad.updatedAt = new Date().toISOString(); ad.vacant = false; write_('AD', ad); }
+    write_('TEAM', team);
+    return { synced: true, accountDirector: ad ? ad.name : null, teamSize: team.length };
+  });
 }

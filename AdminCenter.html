@@ -296,6 +296,7 @@ label.f{display:grid;gap:6px;font-weight:600;font-size:14px}
                 <button class="link" type="button" id="copyBtn" style="margin-inline-start:6px">Copy email</button>
               </div>
               <p class="small" id="adRouteNote" style="margin:12px 0 0"></p>
+              <dl class="adinfo" id="teamExtra" style="margin-top:16px"></dl>
             </div>
             <div class="adside">
               <h3>Your requests</h3>
@@ -497,7 +498,7 @@ function renderReqs(){var ul=$("reqList");ul.innerHTML="";
     li.appendChild(el("div",{"class":"r2"},r.id+" · to "+r.to.name+" · reply by "+String(r.pref).toLowerCase()+" · "+new Date(r.at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})));ul.appendChild(li)})}
 renderReqs();
 // Local copy of the routing rule (used only when the page is opened outside the web app).
-function adActive(ad){return !!(ad&&!ad.vacant&&ad.name&&!ad.endDate&&ad.active!==false)}
+function adActive(ad){return !!(ad&&!ad.vacant&&ad.name&&!ad.endDate&&ad.active!==false&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ad.email||""))}
 function routeOf(ad){if(adActive(ad))return {diverted:false,name:ad.name,email:ad.email,role:"Account Director",reason:""};
   var why=(ad&&ad.name?ad.name:"The Account Director")+" is inactive"+(ad&&ad.endDate?" (end date "+ad.endDate+")":"");
   if(ad&&ad.managerEmail)return {diverted:true,name:ad.managerName||"Manager",email:ad.managerEmail,role:"Manager of the Account Director",reason:why};
@@ -599,10 +600,13 @@ function applyState(st){if(!st)return;
     $("adRouteNote").textContent="Messages you send here are emailed to "+ad.name+".";
     $("adUpdated").textContent=when?"Account Director updated "+when:"";
   }
+  var tx=$("teamExtra");tx.innerHTML="";
+  if(ad.managerName||ad.managerEmail){tx.appendChild(el("dt",null,"Account Director's manager"));var md=el("dd");md.appendChild(document.createTextNode(ad.managerName||""));if(ad.managerEmail){md.appendChild(el("br"));md.appendChild(el("a",{href:"mailto:"+ad.managerEmail,style:"color:var(--sub)"},ad.managerEmail))}tx.appendChild(md)}
+  (st.team||[]).forEach(function(m){if(!m.name)return;tx.appendChild(el("dt",null,m.role||"Team member"));var d=el("dd");d.appendChild(document.createTextNode(m.name+(m.active===false?" (inactive)":"")));if(m.email){d.appendChild(el("br"));d.appendChild(el("a",{href:"mailto:"+m.email,style:"color:var(--sub)"},m.email))}tx.appendChild(d)});
   if(HAS_GAS&&st.messages){requests=st.messages;renderReqs()}
   NOTIFS=st.notifications||[];var c=$("bellCount");c.hidden=!NOTIFS.length;c.textContent=String(NOTIFS.length);
   $("bellBtn").setAttribute("aria-label","Notifications ("+NOTIFS.length+")")}
-function loadState(){if(!HAS_GAS)return;google.script.run.withSuccessHandler(function(st){applyState(st)}).withFailureHandler(function(){}).getState()}
+function loadState(){if(!HAS_GAS){applyState({ad:LOCAL_AD,team:[{role:"Account Executive",name:"Test Account Executive",email:"test.accountexecutive@example.com",active:true}],messages:[],notifications:[]});return}google.script.run.withSuccessHandler(function(st){applyState(st)}).withFailureHandler(function(){}).getState()}
 loadState();
 window.addEventListener("focus",loadState);
 setInterval(loadState,30000);
